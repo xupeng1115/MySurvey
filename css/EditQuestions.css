@@ -22,6 +22,9 @@ html,body{
 a{
     text-decoration: none; 
 }
+ul{
+	list-style-type:none;
+}
 .row{
 	margin:0;
 }
@@ -176,6 +179,7 @@ input{
 
 .content-box .content-right .question-box .question-item{
 	margin-bottom:8px;
+	padding-bottom:30px;
 }
 .content-box .content-right .question-box .question-item .question-item-title{
 	padding:10px 0 16px 15px;
@@ -208,8 +212,123 @@ input{
     vertical-align: middle;
 }
 .content-box .content-right .question-box .question-item .question-options .question-radio-option{
-	
+	position: relative;
+    outline: 0;
+    display: inline-block;
 }
+.content-box .content-right .question-box .question-item .question-options .question-radio-option input{
+    display: inline-block;
+    outline:none;
+}
+.content-box .content-right .question-box .question-item .question-options .question-radio-option .question-text{
+    width:640px;
+    height:32px;
+    line-height:30px;
+    border:1px solid #333;
+    text-align:left;
+    margin-left:7px;
+}
+input[type=radio], input[type=checkbox] {
+    margin: 4px 0 0;
+    margin-top: 1px \9;
+    line-height: normal;
+}
+input[type=radio], input[type=checkbox] {
+    cursor: pointer;
+    vertical-align: middle;
+}
+input[type=radio] {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    width: 14px;
+    height: 14px;
+    outline: 0;
+    cursor: pointer;
+    vertical-align: -2px;
+    border: 1px solid #108cee;
+    -webkit-appearance: none;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+}
+input[type=radio]:before {
+    top: 2px;
+    left: 2px;
+    width: 8px;
+    height: 8px;
+    content: '';
+    position: absolute;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-transition: all .3s;
+    -moz-transition: all .3s;
+    transition: all .3s;
+}
+input[type=radio]:checked:before {
+    background-color: #108cee;
+}
+.content-box .content-right .question-box .question-item .question-options .question-radio-option .option-select{
+	padding:0;
+	width:155px;
+	height:22px;
+	position:absolute;
+	top:-24px;
+	right:0;
+	z-index:15;
+}
+.content-box .content-right .question-box .question-item .question-options .question-radio-option .option-select .option-select-item{
+	float: left;
+    width: 20px;
+    height: 20px;
+    margin: 1px 5px;
+    cursor: pointer;
+}
+.content-box .content-right .question-box .question-item .question-options .question-radio-option .option-select .option-type-checkbox{
+	height:18px;
+	margin-top:2px;
+	margin-left:8px;
+}
+.content-box .content-right .question-box .question-item .question-options .question-radio-option .option-select .option-type-checkbox i{
+	font-size:18px;
+	color:#ccc;
+	margin-right:0;
+	margin-left:2px;
+}
+.content-box .content-right .question-box .question-item .question-options .question-radio-option .option-select .option-type-checkbox i.fa-check-square{
+	display:none;
+}
+.content-box .content-right .question-box .question-item .question-options .question-radio-option .option-select .option-type-scroe{
+	height:18px;
+	margin-top:2px;
+	margin-left:3px;
+	background: url(../img/choice_edit.png) no-repeat;
+    background-position: -58px 0;
+}
+.content-box .content-right .question-box .question-item .question-options .question-radio-option .option-select .option-type-delete{
+	height:18px;
+	margin-top:2px;
+	background: url(../img/choice_edit.png) no-repeat;
+    background-position: -88px 0;
+}
+.content-box .content-right .question-box .question-item .question-options .question-radio-option .option-select .option-type-up{
+	background: url(../img/choice_handle.png) no-repeat;
+    background-position: -41px -222px;
+}
+.content-box .content-right .question-box .question-item .question-options .question-radio-option .option-select .option-type-down{
+	background: url(../img/choice_handle.png) no-repeat;
+    background-position: -41px -241px;
+}
+.content-box .content-right .question-box .question-item .question-options .question-radio-option .add-area {
+    position:absolute;
+    bottom:20px;
+    left:35px;
+    height: 30px;
+    width:60px;
+}
+
+
 /*******************************单选题******************************/
 
 
