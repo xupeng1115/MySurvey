@@ -179,7 +179,8 @@ input{
 
 .content-box .content-right .question-box .question-item{
 	margin-bottom:8px;
-	padding-bottom:30px;
+	padding-bottom:40px;
+	position:relative;
 }
 .content-box .content-right .question-box .question-item .question-item-title{
 	padding:10px 0 16px 15px;
@@ -320,14 +321,35 @@ input[type=radio]:checked:before {
 	background: url(../img/choice_handle.png) no-repeat;
     background-position: -41px -241px;
 }
-.content-box .content-right .question-box .question-item .question-options .question-radio-option .add-area {
+.content-box .content-right .question-box .question-item .add-area{
     position:absolute;
-    bottom:20px;
+    bottom:10px;
     left:35px;
     height: 30px;
-    width:60px;
+    width:63px;
+}
+.content-box .content-right .question-box .question-item .add-area div{
+	float: left;
+    margin: 0 15px 0 0;
+    width: 16px;
+    height: 16px;
+    color: #0786e9;
+    background: url(../img/add.png) no-repeat;
+    cursor: pointer;
+}
+.content-box .content-right .question-box .question-item .add-area .add-choice {
+	
+}
+.content-box .content-right .question-box .question-item .add-area .batch-add-choice {
+	background-position: -28px 0;
 }
 
+
+.content-box .content-right .question-box .question-item .operate {
+    width:
+    height: 36px;
+    cursor: pointer;
+}
 
 /*******************************单选题******************************/
 
