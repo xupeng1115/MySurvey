@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <title>EditQuestions</title>
+    
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="css/EditQuestions.css?v=20171019" />
+	
+	<!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+      <script src="js/respond.min.js"></script>
+    <![endif]-->
+	
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row content">
+			<div class="row top">
+				<div class="col-md-1 top-survey-btn survey-btn">预览问卷</div>
+			</div>
+			<div class="row content-box">
+				<div class="col-md-2 content-left bor">
+					<div class="row type-title">题型选择</div>
+					<div class="row type-list">
+						<div class="row type-item type-radio">单选题</div>
+						<div class="row type-item type-checkbox">多选题</div>
+						<div class="row type-item type-input">单行问答题</div>
+						<div class="row type-item type-multi-input">多行问答题</div>
+						<div class="row type-item type-dec">描述说明</div>
+					</div>
+				</div>
+				<div class="col-md-9 content-right">
+					<input type="text" class="question-title bor" value="呵呵呵呵"/>
+					<div class="question-title-empty tip red">问卷名称不能为空</div>
+					<div class="row question-dec-box bor">
+						<input type="text" class="question-dec" value="欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助！"/>
+					</div>
+					<div class="row question-box">
+						<!-- 单选题 -->
+						<div class="row question-item bor">
+							<div class="question-item-title">
+								<span class="question-item-id">Q1</span>
+								<input type="text" class="question-title-text" value="单选题"/>
+							</div>
+							<ul class"question-options">
+								<li class="question-radio-option">
+									<input type="radio" class="question-radio"/>
+									<input type="text" value="选项1" class="question-radio"/>
+								</li>
+							</ul>
+						</div>
+						
+						<!-- 多选题 -->
+						<div class="row question-item bor">
+							<div class="question-item-title">
+								<span class="question-item-id">Q2</span>
+								<input type="text" class="question-title-text" value="多选题"/>
+							</div>
+						</div>
+						<!-- 单行问答题 -->
+						<div class="row question-item bor">
+							<div class="question-item-title">
+								<span class="question-item-id">Q3</span>
+								<input type="text" class="question-title-text" value="单行问答题"/>
+							</div>
+						</div>
+						<!-- 多行问答题 -->
+						<div class="row question-item bor">
+							<div class="question-item-title">
+								<span class="question-item-id">Q4</span>
+								<input type="text" class="question-title-text" value="多行问答题"/>
+							</div>
+						</div>
+						<!-- 描述说明-->
+						<div class="question-item bor">
+							<div class="question-item-title">
+								<span class="question-item-id">Q5</span>
+								<input type="text" class="question-title-text" value="描述说明"/>
+							</div>
+						</div>
+					</div>
+					<div class="row question-bottom bor">
+						<div class="bottom-survey-btn survey-btn">预览问卷</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+
+<script type="text/javascript" src="js/knockout.min.js"></script>
+<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+	
+</script>
+
+</body>
+</html>
