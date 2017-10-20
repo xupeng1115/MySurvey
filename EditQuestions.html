@@ -34,45 +34,45 @@
 					</div>
 				</div>
 				<div class="col-md-9 content-right">
-					<input type="text" class="question-title bor" value="呵呵呵呵"/>
+					<input type="text" class="question-title bor input-hf" value="呵呵呵呵"/>
 					<div class="question-title-empty tip red">问卷名称不能为空</div>
 					<div class="row question-dec-box bor">
-						<input type="text" class="question-dec" value="欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助！"/>
+						<input type="text" class="question-dec input-hf" value="欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助！"/>
 					</div>
 					<div class="row question-box">
 						<!-- 单选题 -->
 						<div class="row question-item bor">
 							<div class="question-item-title">
 								<span class="question-item-id">Q1</span>
-								<input type="text" class="question-title-text" value="单选题"/>
+								<input type="text" class="question-title-text input-hf" value="单选题"/>
 							</div>
 							<ul class="question-options">
-								<li class="question-radio-option">
+								<li class="question-choice-option">
 									<input type="radio" name="radio" class="question-radio"/>
 									<input type="text" value="选项1" class="question-text"/>
 									<ul class="option-select bor">
-										<li class="option-select-item option-type-checkbox">
+										<li class="option-select-item option-type-checkbox" title="文本框">
 											<i class="fa fa-square-o" aria-hidden="true"></i>
 											<i class="fa fa-check-square" aria-hidden="true"></i>
 										</li>
-										<li class="option-select-item option-type-scroe"></li>
-										<li class="option-select-item option-type-delete"></li>
-										<li class="option-select-item option-type-up"></li>
-										<li class="option-select-item option-type-down"></li>
+										<li class="option-select-item option-type-scroe" title="分值设置"></li>
+										<li class="option-select-item option-type-delete" title="删除"></li>
+										<li class="option-select-item option-type-up" title="上移"></li>
+										<li class="option-select-item option-type-down" title="下移"></li>
 									</ul>
 								</li>
-								<li class="question-radio-option">
+								<li class="question-choice-option">
 									<input type="radio" name="radio" class="question-radio"/>
 									<input type="text" value="选项2" class="question-text"/>
 									<ul class="option-select bor">
-										<li class="option-select-item option-type-checkbox">
+										<li class="option-select-item option-type-checkbox" title="文本框">
 											<i class="fa fa-square-o" aria-hidden="true"></i>
 											<i class="fa fa-check-square" aria-hidden="true"></i>
 										</li>
-										<li class="option-select-item option-type-scroe"></li>
-										<li class="option-select-item option-type-delete"></li>
-										<li class="option-select-item option-type-up"></li>
-										<li class="option-select-item option-type-down"></li>
+										<li class="option-select-item option-type-scroe" title="分值设置"></li>
+										<li class="option-select-item option-type-delete" title="删除"></li>
+										<li class="option-select-item option-type-up" title="上移"></li>
+										<li class="option-select-item option-type-down" title="下移"></li>
 									</ul>
 								</li>
 							</ul>
@@ -81,8 +81,13 @@
 								<div class="batch-add-choice"></div>
 							</div>
 							<div class="operate">
-								
+								<div class="drag operate-type" title="移动"></div>
+								<div class="show-type operate-type" title="显示方式"></div>
+								<div class="copy operate-type" title="复制"></div>
+								<div class="scroe operate-type" title="分值设置"></div>
+								<div class="delete operate-type" title="删除"></div>
 							</div>
+							<div class="save-btn">保存</div>
 						</div>
 						
 						<!-- 多选题 -->
@@ -91,6 +96,48 @@
 								<span class="question-item-id">Q2</span>
 								<input type="text" class="question-title-text" value="多选题"/>
 							</div>
+							<ul class="question-options">
+								<li class="question-choice-option">
+									<input type="checkbox" name="checkbox" class="question-checkbox"/>
+									<input type="text" value="选项1" class="question-text"/>
+									<ul class="option-select bor">
+										<li class="option-select-item option-type-checkbox" title="文本框">
+											<i class="fa fa-square-o" aria-hidden="true"></i>
+											<i class="fa fa-check-square" aria-hidden="true"></i>
+										</li>
+										<li class="option-select-item option-type-scroe" title="分值设置"></li>
+										<li class="option-select-item option-type-delete" title="删除"></li>
+										<li class="option-select-item option-type-up" title="上移"></li>
+										<li class="option-select-item option-type-down" title="下移"></li>
+									</ul>
+								</li>
+								<li class="question-choice-option">
+									<input type="checkbox" name="checkbox" class="question-checkbox"/>
+									<input type="text" value="选项2" class="question-text"/>
+									<ul class="option-select bor">
+										<li class="option-select-item option-type-checkbox" title="文本框">
+											<i class="fa fa-square-o" aria-hidden="true"></i>
+											<i class="fa fa-check-square" aria-hidden="true"></i>
+										</li>
+										<li class="option-select-item option-type-scroe" title="分值设置"></li>
+										<li class="option-select-item option-type-delete" title="删除"></li>
+										<li class="option-select-item option-type-up" title="上移"></li>
+										<li class="option-select-item option-type-down" title="下移"></li>
+									</ul>
+								</li>
+							</ul>
+							<div class="add-area">
+								<div class="add-choice"></div>
+								<div class="batch-add-choice"></div>
+							</div>
+							<div class="operate">
+								<div class="drag operate-type" title="移动"></div>
+								<div class="show-type operate-type" title="显示方式"></div>
+								<div class="copy operate-type" title="复制"></div>
+								<div class="scroe operate-type" title="分值设置"></div>
+								<div class="delete operate-type" title="删除"></div>
+							</div>
+							<div class="save-btn">保存</div>
 						</div>
 						<!-- 单行问答题 -->
 						<div class="row question-item bor">
@@ -98,6 +145,17 @@
 								<span class="question-item-id">Q3</span>
 								<input type="text" class="question-title-text" value="单行问答题"/>
 							</div>
+							<div class="single-box">
+								<input type="text" name="input" class="input-single form-control"/>
+							</div>
+							<div class="operate">
+								<div class="drag operate-type" title="移动"></div>
+								<div class="show-type operate-type" title="显示方式"></div>
+								<div class="copy operate-type" title="复制"></div>
+								<div class="scroe operate-type" title="分值设置"></div>
+								<div class="delete operate-type" title="删除"></div>
+							</div>
+							<div class="save-btn">保存</div>
 						</div>
 						<!-- 多行问答题 -->
 						<div class="row question-item bor">
@@ -105,13 +163,29 @@
 								<span class="question-item-id">Q4</span>
 								<input type="text" class="question-title-text" value="多行问答题"/>
 							</div>
+							<div class="multi-box">
+								<textarea name="multi-input" class="multi-input form-control"></textarea>
+							</div>
+							<div class="operate">
+								<div class="drag operate-type" title="移动"></div>
+								<div class="show-type operate-type" title="显示方式"></div>
+								<div class="copy operate-type" title="复制"></div>
+								<div class="scroe operate-type" title="分值设置"></div>
+								<div class="delete operate-type" title="删除"></div>
+							</div>
+							<div class="save-btn">保存</div>
 						</div>
 						<!-- 描述说明-->
 						<div class="question-item bor">
-							<div class="question-item-title">
-								<span class="question-item-id">Q5</span>
-								<input type="text" class="question-title-text" value="描述说明"/>
+							<div class="dec-input-box">
+								<input type="text" name="input" class="dec-input" value="描述说明"/>
 							</div>
+							<div class="operate dec-operate">
+								<div class="drag operate-type" title="移动"></div>
+								<div class="copy operate-type" title="复制"></div>
+								<div class="delete operate-type" title="删除"></div>
+							</div>
+							<div class="save-btn">保存</div>
 						</div>
 					</div>
 					<div class="row question-bottom bor">
@@ -119,8 +193,27 @@
 					</div>
 				</div>
 			</div>
-			
 		</div>
+		
+		<!-- 弹窗系统 -->
+		<div class="dialog">
+			<div class="delete-tip tip">
+				<div class="tip-top">
+					<span class="tip-title">操作提示</span>
+					<div class="close-btn"><i class="fa fa-times" aria-hidden="true"></i></div>
+				</div>
+				<div class="tip-box">
+					<img src="img/warning_icon.png"/>
+					<span class="delete-text">删除此题卡</span>
+				</div>
+				<div class="tip-bottom">
+					<div class="confirm-btn tip-btn">确定</div>
+					<div class="cancel-btn tip-btn">取消</div>
+				</div>
+			</div>
+		</div>
+		
+		
 	</div>
 
 <script type="text/javascript" src="js/knockout.min.js"></script>
@@ -128,7 +221,30 @@
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 
 <script type="text/javascript">
-	
+	$(function(){
+		$(".question-text").focus(function(){
+			$(this).next().show()
+		})
+		$(".question-text").blur(function(){
+			$(this).next().hide()
+		})
+		$(".close-btn").click(function(){
+			$(".tip").hide();
+			$(".dialog").hide();
+		})
+		$(".cancel-btn").click(function(){
+			$(".tip").hide();
+			$(".dialog").hide();
+		})
+		$(".confirm-btn").click(function(){
+			$(".tip").hide();
+			$(".dialog").hide();
+		})
+		$(".delete").click(function(){
+			$(".dialog").show();
+			$(".tip").show();
+		})
+	})
 </script>
 
 </body>
