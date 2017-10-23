@@ -34,37 +34,47 @@
 					</div>
 				</div>
 				<div class="col-md-9 content-right">
-					<input type="text" class="question-title bor input-hf" value="呵呵呵呵"/>
-					<div class="question-title-empty tip red">问卷名称不能为空</div>
+					<input type="text" class="question-title bor input-hf" data-bind="textInput:Title" maxlength="18"/>
+					<div class="question-title-empty tip red" data-bind="visible:EmptyTitle" style="display:none;">问卷名称不能为空</div>
 					<div class="row question-dec-box bor">
-						<input type="text" class="question-dec input-hf" value="欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助！"/>
+						<div contenteditable="true" class="question-dec input-hf" data-bind="text:Dec"></div>
 					</div>
-					<div class="row question-box">
-						<!-- 单选题 -->
-						<div class="row question-item bor">
+					<div class="row question-box" data-bind="foreach:Datas">
+						
+						<div class="row question-item bor" data-bind="attr:{index:$index(),questionid:QuestionId,score:TypeId!=4?Score:''}">
+							<!-- ko if:(TypeId!==4) -->
 							<div class="question-item-title">
-								<span class="question-item-id">Q1</span>
-								<input type="text" class="question-title-text input-hf" value="单选题"/>
+								<span class="question-item-id" data-bind="text:'Q'+($index()+1)"><!--Q1--></span>
+								<div contenteditable="true" class="question-title-text input-hf" data-bind="text:Content,attr:{type:TypeId}"><!--单选题--></div>
+								<span class="quesition-title-tip" style="display:none;">题干为空</span>
 							</div>
-							<ul class="question-options">
-								<li class="question-choice-option">
+							<!-- /ko -->
+							<!-- ko if:(TypeId===4) -->
+							<div class="dec-input-box">
+								<div contenteditable="true" class="dec-input question-title-text input-hf" data-bind="text:Content,attr:{type:TypeId}"><!--描述说明--></div>
+							</div>
+							<!-- /ko -->
+							<!-- ko if:(TypeId===2) -->
+							<div class="single-box">
+								<input type="text" name="input" class="input-single form-control"/>
+							</div>
+							<!-- /ko -->
+							<!-- ko if:(TypeId===3) -->
+							<div class="multi-box">
+								<textarea name="multi-input" class="multi-input form-control"></textarea>
+							</div>
+							<!-- /ko -->
+							<!-- ko if:(TypeId===0||TypeId===1)-->
+							<ul class="question-options" data-bind="foreach:Options">
+								<li class="question-choice-option" data-bind="attr:{index:$index(),optionid:OptionId,optionscroe:OptionScore}">
+									<!-- ko if:($parent.TypeId===0) -->
 									<input type="radio" name="radio" class="question-radio"/>
-									<input type="text" value="选项1" class="question-text"/>
-									<ul class="option-select bor">
-										<li class="option-select-item option-type-checkbox" title="文本框">
-											<i class="fa fa-square-o" aria-hidden="true"></i>
-											<i class="fa fa-check-square" aria-hidden="true"></i>
-										</li>
-										<li class="option-select-item option-type-scroe" title="分值设置"></li>
-										<li class="option-select-item option-type-delete" title="删除"></li>
-										<li class="option-select-item option-type-up" title="上移"></li>
-										<li class="option-select-item option-type-down" title="下移"></li>
-									</ul>
-								</li>
-								<li class="question-choice-option">
-									<input type="radio" name="radio" class="question-radio"/>
-									<input type="text" value="选项2" class="question-text"/>
-									<ul class="option-select bor">
+									<!-- /ko -->
+									<!-- ko if:($parent.TypeId===1) -->
+									<input type="checkbox" name="checkbox" class="question-checkbox"/>
+									<!-- /ko -->
+									<div contenteditable="true" class="question-text" data-bind="text:OptionContent"></div>
+									<ul class="option-select bor" contenteditable="false">
 										<li class="option-select-item option-type-checkbox" title="文本框">
 											<i class="fa fa-square-o" aria-hidden="true"></i>
 											<i class="fa fa-check-square" aria-hidden="true"></i>
@@ -76,31 +86,38 @@
 									</ul>
 								</li>
 							</ul>
+							<!-- /ko -->
+							<!-- ko if:(TypeId===0||TypeId===1) -->
 							<div class="add-area">
 								<div class="add-choice"></div>
 								<div class="batch-add-choice"></div>
 							</div>
+							<!-- /ko -->
 							<div class="operate">
-								<div class="drag operate-type" title="移动"></div>
-								<div class="show-type operate-type" title="显示方式"></div>
-								<div class="copy operate-type" title="复制"></div>
-								<div class="scroe operate-type" title="分值设置"></div>
-								<div class="delete operate-type" title="删除"></div>
+								<div class="drag operate-type" title="移动" data-bind="attr:{index:$index(),questionid:QuestionId,type:TypeId}"></div>
+								<!-- ko if:(TypeId!==4) -->
+								<div class="show-type operate-type" title="显示方式" data-bind="attr:{index:$index(),questionid:QuestionId,type:TypeId}"></div>
+								<!-- /ko -->
+								<div class="copy operate-type" title="复制" data-bind="attr:{index:$index(),questionid:QuestionId,type:TypeId}"></div>
+								<!-- ko if:(TypeId!==4) -->
+								<div class="scroe operate-type" title="分值设置" data-bind="attr:{index:$index(),questionid:QuestionId,type:TypeId}"></div>
+								<!-- /ko -->
+								<div class="delete operate-type" title="删除" data-bind="attr:{index:$index(),questionid:QuestionId,type:TypeId}"></div>
 							</div>
 							<div class="save-btn">保存</div>
 						</div>
 						
 						<!-- 多选题 -->
-						<div class="row question-item bor">
+						<!--<div class="row question-item bor">
 							<div class="question-item-title">
 								<span class="question-item-id">Q2</span>
-								<input type="text" class="question-title-text" value="多选题"/>
+								<div contenteditable="true" class="question-title-text input-hf" data-bind="text:'多选题',attr:{type:1}"></div>
 							</div>
 							<ul class="question-options">
 								<li class="question-choice-option">
 									<input type="checkbox" name="checkbox" class="question-checkbox"/>
-									<input type="text" value="选项1" class="question-text"/>
-									<ul class="option-select bor">
+									<div contenteditable="true" class="question-text" data-bind="text:'选项1'"></div>
+									<ul class="option-select bor" contenteditable="false">
 										<li class="option-select-item option-type-checkbox" title="文本框">
 											<i class="fa fa-square-o" aria-hidden="true"></i>
 											<i class="fa fa-check-square" aria-hidden="true"></i>
@@ -113,8 +130,8 @@
 								</li>
 								<li class="question-choice-option">
 									<input type="checkbox" name="checkbox" class="question-checkbox"/>
-									<input type="text" value="选项2" class="question-text"/>
-									<ul class="option-select bor">
+									<div contenteditable="true" class="question-text" data-bind="text:'选项1'"></div>
+									<ul class="option-select bor" contenteditable="false">
 										<li class="option-select-item option-type-checkbox" title="文本框">
 											<i class="fa fa-square-o" aria-hidden="true"></i>
 											<i class="fa fa-check-square" aria-hidden="true"></i>
@@ -138,12 +155,13 @@
 								<div class="delete operate-type" title="删除"></div>
 							</div>
 							<div class="save-btn">保存</div>
-						</div>
-						<!-- 单行问答题 -->
-						<div class="row question-item bor">
+						</div>-->
+						<!-- /ko --> 
+
+						<!--<div class="row question-item bor">
 							<div class="question-item-title">
 								<span class="question-item-id">Q3</span>
-								<input type="text" class="question-title-text" value="单行问答题"/>
+								<div contenteditable="true" class="question-title-text input-hf" data-bind="text:'单行问答题',attr:{type:2}"></div>
 							</div>
 							<div class="single-box">
 								<input type="text" name="input" class="input-single form-control"/>
@@ -157,11 +175,11 @@
 							</div>
 							<div class="save-btn">保存</div>
 						</div>
-						<!-- 多行问答题 -->
+
 						<div class="row question-item bor">
 							<div class="question-item-title">
 								<span class="question-item-id">Q4</span>
-								<input type="text" class="question-title-text" value="多行问答题"/>
+								<div contenteditable="true" class="question-title-text input-hf" data-bind="text:'多行问答题',attr:{type:3}"></div>
 							</div>
 							<div class="multi-box">
 								<textarea name="multi-input" class="multi-input form-control"></textarea>
@@ -175,10 +193,10 @@
 							</div>
 							<div class="save-btn">保存</div>
 						</div>
-						<!-- 描述说明-->
+
 						<div class="question-item bor">
 							<div class="dec-input-box">
-								<input type="text" name="input" class="dec-input" value="描述说明"/>
+								<div contenteditable="true" class="dec-input question-title-text input-hf" data-bind="text:'描述说明',attr:{type:4}"></div>
 							</div>
 							<div class="operate dec-operate">
 								<div class="drag operate-type" title="移动"></div>
@@ -186,7 +204,7 @@
 								<div class="delete operate-type" title="删除"></div>
 							</div>
 							<div class="save-btn">保存</div>
-						</div>
+						</div>-->
 					</div>
 					<div class="row question-bottom bor">
 						<div class="bottom-survey-btn survey-btn">预览问卷</div>
@@ -219,15 +237,233 @@
 <script type="text/javascript" src="js/knockout.min.js"></script>
 <script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
-
+<script>
+	var Datas=[
+		{
+			"QuestionId":10,
+			"TypeId":0,
+			"Content":"单选题",
+			"Score":10,
+			"Options":[
+				{
+					"OptionId":0,
+					"OptionContent":"选项1",
+					"OptionScore":3,
+				},
+				{
+					"OptionId":0,
+					"OptionContent":"选项1",
+					"OptionScore":3,
+				}
+			]
+		},
+		{
+			"QuestionId":11,
+			"TypeId":1,
+			"Content":"多选题",
+			"Score":20,
+			"Options":[
+				{
+					"OptionId":0,
+					"OptionContent":"选项1",
+					"OptionScore":5,
+				},
+				{
+					"OptionId":1,
+					"OptionContent":"选项1",
+					"OptionScore":8,
+				}
+			]
+		},
+		{
+			"QuestionId":12,
+			"TypeId":2,
+			"Content":"单行问答题",
+			"Score":15
+		},
+		{
+			"QuestionId":13,
+			"TypeId":3,
+			"Content":"多行问答题",
+			"Score":25,
+		},
+		{
+			"QuestionId":14,
+			"TypeId":4,
+			"Content":"描述说明",
+		}
+	]
+	var oTemplateData=[
+		{
+			"QuestionId":0,
+			"TypeId":0,
+			"Content":"单选题",
+			"Score":10,
+			"Options":[
+				{
+					"OptionId":0,
+					"OptionContent":"选项1",
+					"OptionScore":3,
+				},
+				{
+					"OptionId":0,
+					"OptionContent":"选项1",
+					"OptionScore":3,
+				}
+			]
+		},
+		{
+			"QuestionId":1,
+			"TypeId":1,
+			"Content":"多选题",
+			"Score":20,
+			"Options":[
+				{
+					"OptionId":0,
+					"OptionContent":"选项1",
+					"OptionScore":5,
+				},
+				{
+					"OptionId":1,
+					"OptionContent":"选项1",
+					"OptionScore":8,
+				}
+			]
+		},
+		{
+			"QuestionId":2,
+			"TypeId":2,
+			"Content":"单行问答题",
+			"Score":15
+		},
+		{
+			"QuestionId":3,
+			"TypeId":3,
+			"Content":"多行问答题",
+			"Score":25,
+		},
+		{
+			"QuestionId":4,
+			"TypeId":4,
+			"Content":"描述说明",
+		}
+	]
+</script>
 <script type="text/javascript">
+	
+	var vm={
+		CurrentQustion:ko.observable(),
+		Title:ko.observable('哈哈哈'),
+		Dec:ko.observable('欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助！'),
+		Datas:ko.observableArray(Datas),
+		mySort:function(arr,index){
+			for(var i=0;i<arr.length;i++){
+				if(i>=index){
+					arr[i].QuestionId=arr[i].QuestionId+1;
+				}
+			}
+			return arr;
+		}
+	}
+	vm.EmptyTitle=ko.pureComputed(function(){
+		if(this.Title().length>0){
+			return false;
+		}else{
+			return true;
+		}
+	},vm)
+	
+	ko.applyBindings(vm);
+
+
 	$(function(){
-		$(".question-text").focus(function(){
-			$(this).next().show()
+		
+		window.onscroll=function(){
+			if($(document).scrollTop()>=107){
+				$(".content-left").css({
+					"position":"fixed",
+					"left":"532px"
+				})
+			}else{
+				$(".content-left").css({
+					"position":"absolute",
+					"left":"1px"
+				})
+			}
+		}
+		
+		$(".question-title-text").focus(function(){
+			var oType=$(this).attr("type");
+			switch(oType){
+				case '0':
+					if($(this).text()==="单选题"){
+						$(this).text("");
+					}
+				break;
+				case '1':
+					if($(this).text()==="多选题"){
+						$(this).text("");
+					}
+				break;
+				case '2':
+					if($(this).text()==="单行问答题"){
+						$(this).text("");
+					}
+				break;
+				case '3':
+					if($(this).text()==="多行问答题"){
+						$(this).text("");
+					}
+				break;
+				case '4':
+					if($(this).text()==="描述说明"){
+						$(this).text("");
+					}
+				break;
+			}
+		}).blur(function(){
+			var oType=$(this).attr("type");
+			switch(oType){
+				case '0':
+					if($(this).text()===""){
+						$(this).text("单选题");
+					}
+				break;
+				case '1':
+					if($(this).text()===""){
+						$(this).text("多选题");
+					}
+				break;
+				case '2':
+					if($(this).text()===""){
+						$(this).text("单行问答题");
+					}
+				break;
+				case '3':
+					if($(this).text()===""){
+						$(this).text("多行问答题");
+					}
+				break;
+				case '4':
+					if($(this).text()===""){
+						$(this).text("描述说明");
+					}
+				break;
+			}
 		})
-		$(".question-text").blur(function(){
+		
+		$(".question-text").focus(function(){
+			if($(this).text()==='选项1'){
+				$(this).text("");
+			}
+			$(this).next().show()
+		}).blur(function(){
+			if($(this).text()===""){
+				$(this).text('选项1');
+			}
 			$(this).next().hide()
 		})
+		
 		$(".close-btn").click(function(){
 			$(".tip").hide();
 			$(".dialog").hide();
@@ -237,6 +473,7 @@
 			$(".dialog").hide();
 		})
 		$(".confirm-btn").click(function(){
+			vm.CurrentQustion();
 			$(".tip").hide();
 			$(".dialog").hide();
 		})
@@ -244,6 +481,19 @@
 			$(".dialog").show();
 			$(".tip").show();
 		})
+		$(".copy").click(function(){
+			var oIndex=parseInt($(this).attr("index"));
+			var oNew=vm.Datas()[oIndex];
+			var oArr1=vm.Datas();
+			oArr1.splice(oIndex,0,oNew);
+//			var oArr2=mySort(oArr1,oIndex+1);
+//			console.log(oArr2);
+//			vm.Datas(oArr2);
+			vm.Datas(vm.mySort(oArr1,oIndex+1));
+//			var oEle=$(this).parent(".operate").parent(".question-item");
+//			oEle.clone(true).insertAfter(oEle);
+		})
+		
 	})
 </script>
 
