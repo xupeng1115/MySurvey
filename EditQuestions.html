@@ -26,7 +26,7 @@
 				<div class="col-md-2 content-left bor">
 					<div class="row type-title">题型选择</div>
 					<div class="row type-list" data-bind="foreach:Lists">
-						<div class="row type-item type-radio" data-bind="css:{'type-radio':$index()===0,'type-checkbox':$index()===1,'type-input':$index()===2,'type-multi-input':$index()===3,'type-dec':$index()===4},text:Content,attr:{index:$index()},click:vm.AddItem.bind($index(),$data,event,)"><!--单选题--></div>
+						<div class="row type-item type-radio" data-bind="css:{'type-radio':TypeId===0,'type-checkbox':$index()===1,'type-input':$index()===2,'type-multi-input':$index()===3,'type-dec':$index()===4},text:Content,attr:{index:$index()},click:vm.AddItem.bind($data,event,$index())"><!--单选题--></div>
 					</div>
 				</div>
 				<div class="col-md-9 content-right">
@@ -37,7 +37,7 @@
 					</div>
 					<div class="row question-box" id="sortable" data-bind="foreach:Datas">
 						
-						<div class="row question-item bor" data-bind="attr:{id:$index(),index:$index(),score:TypeId!=4?Score:'',questionid:TypeId!==4?QuestionId:''}">
+						<div class="row question-item bor" data-bind="attr:{id:$index(),index:$index(),score:TypeId!=4?Score:'',questionid:TypeId!=4?QuestionId:''}">
 							<!-- ko if:(TypeId!==4) -->
 							<div class="question-item-title">
 								<span class="question-item-id" data-bind="text:$parent.Num($index())"><!--Q1--></span>
@@ -94,7 +94,7 @@
 								<!-- ko if:(TypeId!==4) -->
 								<div class="scroe operate-type" title="分值设置" data-bind="attr:{index:$index(),questionid:QuestionId,type:TypeId}"></div>
 								<!-- /ko -->
-								<div class="copy operate-type" title="复制" data-bind="attr:{index:$index(),type:TypeId},click:function(data,event){$parent.Copy($index(),data,event)}"></div>
+								<div class="copy operate-type" title="复制" data-bind="attr:{index:$index(),type:TypeId},click:$parent.Copy.bind($data,event,$index())"></div>
 								<!-- ko if:(TypeId!==4) -->
 								<div class="show-type operate-type" title="显示方式" data-bind="attr:{index:$index(),questionid:QuestionId,type:TypeId}"></div>
 								<!-- /ko -->
@@ -184,6 +184,7 @@
 			"Score":25,
 		},
 		{
+			"QuestionId":14,
 			"TypeId":4,
 			"Content":"描述说明",
 		}
@@ -237,29 +238,31 @@
 			"Content":"多行问答题",
 			"Score":25,
 		},
-		{
+		{	
+			"QuestionId":4,
 			"TypeId":4,
 			"Content":"描述说明",
 		}
 	]
 	var Lists=[
 		{
-			"QuestionId":0,
+			"TypeId":0,
 			"Content":"单选题"
 		},
 		{
-			"QuestionId":1,
+			"TypeId":1,
 			"Content":"多选题"
 		},
 		{
-			"QuestionId":2,
+			"TypeId":2,
 			"Content":"单行问答题"
 		},
 		{
-			"QuestionId":3,
+			"TypeId":3,
 			"Content":"多行问答题"
 		},
 		{
+			"TypeId":4,
 			"Content":"描述说明"
 		}
 	]
@@ -273,43 +276,27 @@
 		Dec:ko.observable('欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助！'),
 		Lists:ko.observableArray(Lists),
 		Datas:ko.observableArray(Datas),
-		AddItem:function(index,data,event){
-			this.AddQuestion(index);
+		AddItem:function(event,index,data){
+			var oTemplate=vm.TemplateDatas()[index];
+			vm.Datas.push(oTemplate);
 		},
-		Copy:function(index,data,event){
-			vm.Datas.splice(index,0,data);
-			
+		Copy:function(event,index,data){
 			var oArr=[];
 			for(var i=0;i<vm.Datas().length;i++){
 				oArr.push(vm.Datas()[i]);
 			}
 			
+			oArr.splice(index,0,data);
+			
 			var oId=oArr[index].QuestionId;
-			for(var i=index+1;i<vm.Datas().length;i++){
-				if((vm.Datas()[i].TypeId!==4)){
+			for(var i=index+1;i<oArr.length;i++){
+				if((oArr[i].TypeId!==4)){
 					oId++;
-					vm.Datas()[i].QuestionId=oId;
+					oArr[i].QuestionId=oId;
 				}
 			}
-		},
-		Sort:function(index,data){
-//			var oId=vm.Datas()[index].QuestionId;
-//			vm.Datas.splice(index,0,data);
-//			for(var i=index+1;i<vm.Datas().length;i++){
-//				if((vm.Datas()[i].TypeId!==4)){
-//					oId++;
-//					vm.Datas()[i].QuestionId=oId;
-//				}
-//			}
-//			var oArr=JSON.stringify(vm.Datas());
-//			vm.Datas(JSON.parse(oArr));
-		},
-		AddQuestion:function(index){
-			var oTemplate=vm.TemplateDatas()[index];
-			if(index!==4){
-				oTemplate.QuestionId=vm.Datas()[vm.Datas().length-1].QuestionId+1;
-			}
-			vm.Datas.push(oTemplate);
+			
+			vm.Datas(oArr);
 		},
 		Num:function(index){
 			var num=0;
@@ -340,18 +327,29 @@
 		//表格排序
 		$(function(){
 			var arr = '';
-		    var sort = $( "#sortable" ).sortable({
+		    var sort = $("#sortable").sortable({
 		        handle: ".drag",
 		        opacity:0,
 		        delay:100,
 		        scroll:true,
 		        cursor:'.drag',
-		       	stop:function(){	//当排序动作结束时触发此事件。
+		       	stop:function(event,ui){	//当排序动作结束时触发此事件。
+		       		//记录选中的题目ID
+		       		var oId=ui.item.attr("id");
 					//记录sort后的id顺序数组
-			        var arr = $( "#sortable" ).sortable('toArray');
-			        console.log(arr);
-					//拖拽后利用localStorage记录顺序
-//		        	localStorage.arr = arr;
+			        var arr = $("#sortable").sortable('toArray');
+					console.log(arr);
+			        var arr2=[];
+			        for(var j=0;j<arr.length;j++){
+			        	arr2.push(vm.Datas()[j]);
+			        }
+					var arr3=[];
+			        for(var i=0;i<arr.length;i++){
+			        	arr3.push(arr2[Number(arr[i])]);
+			       	}
+			        console.log(arr3);
+		       		vm.Datas(arr3);
+	        		console.log(vm.Datas());
 		        }
 		    });
 		}())
