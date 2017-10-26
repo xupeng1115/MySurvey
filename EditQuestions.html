@@ -61,7 +61,7 @@
 							</div>
 							<!-- /ko -->
 							<!-- ko if:(TypeId===0||TypeId===1)-->
-							<ul class="question-options" data-bind="foreach:Options">
+							<ul class="question-options" data-bind="foreach:Options,attr:{index:$index(),type:TypeId}">
 								<li class="question-choice-option" data-bind="attr:{index:$index(),optionid:OptionId,optionscroe:OptionScore}">
 									<!-- ko if:($parent.TypeId===0) -->
 									<input type="radio" name="radio" class="question-radio"/>
@@ -69,33 +69,33 @@
 									<!-- ko if:($parent.TypeId===1) -->
 									<input type="checkbox" name="checkbox" class="question-checkbox"/>
 									<!-- /ko -->
-									<div contenteditable="true" class="question-text" data-bind="text:OptionContent"></div>
+									<div contenteditable="true" class="question-text" data-bind="attr:{index:$index(),type:$parent.TypeId},text:OptionContent==='选项'?(OptionContent+($index()+1)):OptionContent"></div>
 									<ul class="option-select bor" contenteditable="false">
-										<li class="option-select-item option-type-checkbox" title="文本框">
+										<li class="option-select-item option-type-checkbox" title="文本框" data-bind="attr:{index:$index()}">
 											<i class="fa fa-square-o" aria-hidden="true"></i>
 											<i class="fa fa-check-square" aria-hidden="true"></i>
 										</li>
-										<li class="option-select-item option-type-scroe" title="分值设置"></li>
-										<li class="option-select-item option-type-delete" title="删除"></li>
-										<li class="option-select-item option-type-up" title="上移"></li>
-										<li class="option-select-item option-type-down" title="下移"></li>
+										<li class="option-select-item option-type-scroe" title="分值设置" data-bind="attr:{index:$index()}"></li>
+										<li class="option-select-item option-type-delete" title="删除" data-bind="attr:{index:$index()}"></li>
+										<li class="option-select-item option-type-up" title="上移" data-bind="attr:{index:$index()}"></li>
+										<li class="option-select-item option-type-down" title="下移" data-bind="attr:{index:$index()}"></li>
 									</ul>
 								</li>
 							</ul>
 							<!-- /ko -->
 							<!-- ko if:(TypeId===0||TypeId===1) -->
 							<div class="add-area">
-								<div class="add-choice"></div>
-								<div class="batch-add-choice"></div>
+								<div class="add-choice" title="增加" data-bind="attr:{index:$index(),type:TypeId,questionid:QuestionId},click:$parent.AddOption.bind($data,event,$index(),TypeId)"></div>
+								<div class="batch-add-choice" title="批量增加" data-bind="attr:{index:$index(),type:TypeId,questionid:QuestionId},click:$parent.AddOptions.bind($data,event,$index(),TypeId)"></div>
 							</div>
 							<!-- /ko -->
 							<div class="operate">
-								<div class="delete operate-type" title="删除" data-bind="attr:{index:$index(),type:TypeId}"></div>
+								<div class="delete operate-type" title="删除" data-bind="attr:{index:$index(),type:TypeId,questionid:QuestionId},click:$parent.Delete.bind($data,event,$index())"></div>
 								<!-- ko if:(TypeId!==4) -->
 								<div class="scroe operate-type" title="分值设置" data-bind="attr:{index:$index(),questionid:QuestionId,type:TypeId}"></div>
 								<!-- /ko -->
 								<div class="copy operate-type" title="复制" data-bind="attr:{index:$index(),type:TypeId},click:$parent.Copy.bind($data,event,$index())"></div>
-								<!-- ko if:(TypeId!==4) -->
+								<!-- ko if:(TypeId===0||TypeId===1) -->
 								<div class="show-type operate-type" title="显示方式" data-bind="attr:{index:$index(),questionid:QuestionId,type:TypeId}"></div>
 								<!-- /ko -->
 								<div class="drag operate-type" title="移动" data-bind="attr:{index:$index(),type:TypeId}"></div>
@@ -111,19 +111,21 @@
 		</div>
 		
 		<!-- 弹窗系统 -->
-		<div class="dialog">
-			<div class="delete-tip tip-box">
+		<div class="dialog" data-bind="visible:DialogShow" style="display:none;">
+			<div class="delete-tip tip-box" data-bind="visible:DeleteShow" style="display:none;">
 				<div class="tip-top">
 					<span class="tip-title">操作提示</span>
-					<div class="close-btn"><i class="fa fa-times" aria-hidden="true"></i></div>
+					<div class="close-btn" data-bind="click:DeleteClose"><i class="fa fa-times" aria-hidden="true"></i></div>
 				</div>
-				<div class="tip-box">
+				<div class="tip-content">
 					<img src="img/warning_icon.png"/>
-					<span class="delete-text">删除此题卡</span>
+					<span class="delete-option-text" data-bind="visible:DeleteOptionShow" style="display:none;">选项个数不能为0</span>
+					<span class="delete-text" data-bind="visible:DeleteShow" style="display:none;">删除此题卡</span>
 				</div>
 				<div class="tip-bottom">
-					<div class="confirm-btn tip-btn">确定</div>
-					<div class="cancel-btn tip-btn">取消</div>
+					<div class="confirm-btn tip-btn" data-bind="visible:DeleteShow,click:DeleteConfirm" style="display:none;">确定</div>
+					<div class="cancel-btn tip-btn" data-bind="visible:DeleteShow,click:DeleteCancel" style="display:none;">取消</div>
+					<div class="confirm-btn confirm-option-btn tip-btn" data-bind="visible:DeleteOptionShow,click:DeleteOptionConfirm" style="display:none;">确定</div>
 				</div>
 			</div>
 		</div>
@@ -143,12 +145,12 @@
 			"Options":[
 				{
 					"OptionId":0,
-					"OptionContent":"选项1",
+					"OptionContent":"选项",
 					"OptionScore":3,
 				},
 				{
 					"OptionId":0,
-					"OptionContent":"选项1",
+					"OptionContent":"选项",
 					"OptionScore":3,
 				}
 			]
@@ -161,12 +163,12 @@
 			"Options":[
 				{
 					"OptionId":0,
-					"OptionContent":"选项1",
+					"OptionContent":"选项",
 					"OptionScore":5,
 				},
 				{
 					"OptionId":1,
-					"OptionContent":"选项1",
+					"OptionContent":"选项",
 					"OptionScore":8,
 				}
 			]
@@ -198,12 +200,12 @@
 			"Options":[
 				{
 					"OptionId":0,
-					"OptionContent":"选项1",
+					"OptionContent":"选项",
 					"OptionScore":3,
 				},
 				{
 					"OptionId":0,
-					"OptionContent":"选项1",
+					"OptionContent":"选项",
 					"OptionScore":3,
 				}
 			]
@@ -216,12 +218,12 @@
 			"Options":[
 				{
 					"OptionId":0,
-					"OptionContent":"选项1",
+					"OptionContent":"选项",
 					"OptionScore":5,
 				},
 				{
 					"OptionId":1,
-					"OptionContent":"选项1",
+					"OptionContent":"选项",
 					"OptionScore":8,
 				}
 			]
@@ -270,6 +272,13 @@
 <script type="text/javascript">
 	
 	var vm={
+		BlurKey:ko.observable(true),
+		DeleteIndex:ko.observable(),
+		ContinueCopy:ko.observable(true),
+		ContinueAdd:ko.observable(true),
+		DialogShow:ko.observable(false),
+		DeleteShow:ko.observable(false),
+		DeleteOptionShow:ko.observable(false),
 		TemplateDatas:ko.observableArray(TemplateDatas),
 		CurrentId:ko.observable(Datas[0].QuestionId),
 		Title:ko.observable('哈哈哈'),
@@ -277,26 +286,75 @@
 		Lists:ko.observableArray(Lists),
 		Datas:ko.observableArray(Datas),
 		AddItem:function(event,index,data){
-			var oTemplate=vm.TemplateDatas()[index];
-			vm.Datas.push(oTemplate);
+			if(vm.ContinueAdd()){
+				vm.ContinueAdd(false);
+				var oTemplate=vm.TemplateDatas()[index];
+				Datas.push(oTemplate);
+				vm.Datas(Datas);
+				vm.AddScroll();
+				vm.ContinueAdd(true);
+			}
 		},
 		Copy:function(event,index,data){
-			var oArr=[];
-			for(var i=0;i<vm.Datas().length;i++){
-				oArr.push(vm.Datas()[i]);
+			if(vm.ContinueCopy()){
+				vm.ContinueCopy(false);
+
+				var oItem=Datas[index];
+				oItem.QuestionId+=1;
+				Datas.splice(index,0,oItem);
+				vm.Datas(Datas);
+				console.log(Datas);
+				vm.ContinueCopy(true);
 			}
-			
-			oArr.splice(index,0,data);
-			
-			var oId=oArr[index].QuestionId;
-			for(var i=index+1;i<oArr.length;i++){
-				if((oArr[i].TypeId!==4)){
-					oId++;
-					oArr[i].QuestionId=oId;
+		},
+		Delete:function(event,index,data){
+			vm.DeleteIndex(index);
+			vm.DialogShow(true);
+			vm.DeleteShow(true);
+		},
+		DeleteConfirm:function(){
+			var oItem=Datas[vm.DeleteIndex()];
+			Datas.splice(vm.DeleteIndex(),1);
+			vm.Datas(Datas);
+			vm.DeleteShow(false);
+			vm.DialogShow(false);
+		},
+		DeleteCancel:function(){
+			vm.DeleteShow(false);
+			vm.DialogShow(false);
+		},
+		DeleteClose:function(){
+			if(vm.DeleteOptionShow()){
+				$(".delete-tip").hide();
+				vm.DeleteOptionShow(false);
+			}
+			if(vm.DeleteShow()){
+				vm.DeleteShow(false);
+			}
+			vm.DialogShow(false);
+		},
+		DeleteOptionConfirm:function(){
+			$(".delete-tip").hide();
+			vm.DeleteOptionShow(false);
+			vm.DialogShow(false);
+		},
+		AddOption:function(event,index,type,data){
+			if(vm.BlurKey()){
+				var arr2=[];
+				var oTemplate=TemplateDatas[type].Options[0];
+				oTemplate.OptionContent="选项";
+				Datas[index].Options.push(oTemplate);
+				console.log(oTemplate);
+				for(var i=0;i<Datas.length;i++){
+					arr2.push(Datas[i]);
 				}
+				vm.Datas([]);
+				vm.Datas(arr2);
 			}
-			
-			vm.Datas(oArr);
+		},
+		AddOptions:function(event,index,type,data){
+//			console.log(index);
+//			console.log(type);
 		},
 		Num:function(index){
 			var num=0;
@@ -310,6 +368,10 @@
 				}
 			}
 			return "Q"+num;
+		},
+		AddScroll:function(){
+			var oHeight=$(".content-right").height()-320;
+			$(document).scrollTop(oHeight);
 		}
 	}
 	vm.EmptyTitle=ko.pureComputed(function(){
@@ -330,26 +392,33 @@
 		    var sort = $("#sortable").sortable({
 		        handle: ".drag",
 		        opacity:0,
-		        delay:100,
+		        delay:10,
 		        scroll:true,
 		        cursor:'.drag',
 		       	stop:function(event,ui){	//当排序动作结束时触发此事件。
-		       		//记录选中的题目ID
-		       		var oId=ui.item.attr("id");
+		       		var oIndex;		//题目最后放置的位置index
+		       		var oItem;		//题目的数组元素对象
+		       		var oId=Number(ui.item.attr("id"));		//题目的初始位置index;
 					//记录sort后的id顺序数组
 			        var arr = $("#sortable").sortable('toArray');
-					console.log(arr);
-			        var arr2=[];
-			        for(var j=0;j<arr.length;j++){
-			        	arr2.push(vm.Datas()[j]);
-			        }
-					var arr3=[];
+			        console.log(arr);
 			        for(var i=0;i<arr.length;i++){
-			        	arr3.push(arr2[Number(arr[i])]);
+			        	if(Number(arr[i])===oId){
+			        		if(i!==oId){
+			        			oIndex=i;
+				        		oItem=Datas[oId];
+				        		console.log(oId);
+				        		console.log(oIndex);
+				        		console.log(oItem);
+				        		Datas.splice(oId,1);
+				        		Datas.splice(oIndex,0,oItem);
+			        			vm.Datas([]);
+			        			vm.Datas(Datas);
+	        					console.log(vm.Datas());
+				        		break;
+			        		}
+			        	}
 			       	}
-			        console.log(arr3);
-		       		vm.Datas(arr3);
-	        		console.log(vm.Datas());
 		        }
 		    });
 		}())
@@ -438,35 +507,40 @@
 		})
 		
 		$("body").on("focus",".question-text",function(){
-			if($(this).text()==='选项1'){
+			vm.BlurKey(false);
+			var oIndex=$(this).attr("index");
+			if($(this).text()===('选项'+(Number(oIndex)+1))){
 				$(this).text("");
 			}
-			$(this).next().show()
+			$(this).next().show();
 		})
 		
 		$("body").on("blur",".question-text",function(){
+			var oIndex=$(this).attr("index");
+			var oItemIndex=$(this).parent(".question-choice-option").parent(".question-options").attr("index");
 			if($(this).text()===""){
-				$(this).text('选项1');
+				$(this).text('选项'+(Number(oIndex)+1));
+			}else{
+				Datas[Number(oItemIndex)].Options[Number(oIndex)].OptionContent=$(this).text();
+				vm.Datas([]);
+				vm.Datas(Datas);
 			}
-			$(this).next().hide()
+			$(this).next().hide();
+			vm.BlurKey(true);
 		})
 		
-		$(".close-btn").click(function(){
-			$(".tip").hide();
-			$(".dialog").hide();
-		})
-		$(".cancel-btn").click(function(){
-			$(".tip").hide();
-			$(".dialog").hide();
-		})
-		$(".confirm-btn").click(function(){
-			$(".tip").hide();
-			$(".dialog").hide();
-		})
-		$(".delete").click(function(){
+		$("body").on("click",".option-type-delete",function(){
 			var oIndex=$(this).attr("index");
-			$(".dialog").show();
-			$(".tip").show();
+			var oItemIndex=$(this).parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index");
+			console.log(oItemIndex);
+			if(Datas[Number(oItemIndex)].Options.length<=1){
+				vm.DialogShow(true);
+				vm.DeleteOptionShow(true);
+				$(".delete-tip").show();
+			}else{
+				Datas[Number(oItemIndex)].Options.splice(Number(oIndex),1);
+				$(this).parent(".option-select").parent(".question-choice-option").remove();
+			}
 		})
 		
 	})

@@ -600,14 +600,14 @@ input[type=checkbox]:checked:before {
 }
 
 /************************删除************************/
-.dialog .tip-box .tip-box{
+.dialog .tip-box .tip-content{
 	padding:30px;
 	overflow: hidden;
     zoom: 1;
     font-size: 14px;
     text-align:center;
 }
-.dialog .tip-box .tip-box img{
+.dialog .tip-box .tip-content img{
 	vertical-align: middle;
 	margin-right:20px;
 }
@@ -651,10 +651,7 @@ input[type=checkbox]:checked:before {
 .dialog .tip-box .tip-bottom .cancel-btn:hover{
 	background-color: #cfe8f9;
 }
-.dialog{
-	display:none;
+.dialog .tip-box .tip-bottom .confirm-option-btn{
+	left:50%;
+	margin-left:-37px;
 }
-.dialog .tip-box{
-	display:none;
-}
-
