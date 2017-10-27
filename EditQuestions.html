@@ -70,7 +70,7 @@
 									<input type="checkbox" name="checkbox" class="question-checkbox"/>
 									<!-- /ko -->
 									<div contenteditable="true" class="question-text" data-bind="attr:{index:$index(),type:$parent.TypeId},text:OptionContent==='选项'?(OptionContent+($index()+1)):OptionContent"></div>
-									<ul class="option-select bor" contenteditable="false">
+									<ul class="option-select bor" contenteditable="false" style="display:none;">
 										<li class="option-select-item option-type-checkbox" title="文本框" data-bind="attr:{index:$index()}">
 											<i class="fa fa-square-o" aria-hidden="true"></i>
 											<i class="fa fa-check-square" aria-hidden="true"></i>
@@ -85,8 +85,8 @@
 							<!-- /ko -->
 							<!-- ko if:(TypeId===0||TypeId===1) -->
 							<div class="add-area">
-								<div class="add-choice" title="增加" data-bind="attr:{index:$index(),type:TypeId,questionid:QuestionId},click:$parent.AddOption.bind($data,event,$index(),TypeId)"></div>
-								<div class="batch-add-choice" title="批量增加" data-bind="attr:{index:$index(),type:TypeId,questionid:QuestionId},click:$parent.AddOptions.bind($data,event,$index(),TypeId)"></div>
+								<div class="add-choice" title="增加" data-bind="attr:{index:$index(),type:TypeId,questionid:QuestionId}"></div>
+								<div class="batch-add-choice" title="批量增加" data-bind="attr:{index:$index(),type:TypeId,questionid:QuestionId}"></div>
 							</div>
 							<!-- /ko -->
 							<div class="operate">
@@ -272,7 +272,9 @@
 <script type="text/javascript">
 	
 	var vm={
-		BlurKey:ko.observable(true),
+		ItemIndex:ko.observable(-1),
+		OptionIndex:ko.observable(-1),
+		OptionKey:ko.observable(false),
 		DeleteIndex:ko.observable(),
 		ContinueCopy:ko.observable(true),
 		ContinueAdd:ko.observable(true),
@@ -298,12 +300,15 @@
 		Copy:function(event,index,data){
 			if(vm.ContinueCopy()){
 				vm.ContinueCopy(false);
-
 				var oItem=Datas[index];
 				oItem.QuestionId+=1;
-				Datas.splice(index,0,oItem);
+				
+				//深拷贝
+				var Datas2=$.extend(true,[],Datas);
+				Datas2.splice(index,0,oItem)
+				Datas=Datas2;
+				vm.Datas([]);
 				vm.Datas(Datas);
-				console.log(Datas);
 				vm.ContinueCopy(true);
 			}
 		},
@@ -337,24 +342,6 @@
 			$(".delete-tip").hide();
 			vm.DeleteOptionShow(false);
 			vm.DialogShow(false);
-		},
-		AddOption:function(event,index,type,data){
-			if(vm.BlurKey()){
-				var arr2=[];
-				var oTemplate=TemplateDatas[type].Options[0];
-				oTemplate.OptionContent="选项";
-				Datas[index].Options.push(oTemplate);
-				console.log(oTemplate);
-				for(var i=0;i<Datas.length;i++){
-					arr2.push(Datas[i]);
-				}
-				vm.Datas([]);
-				vm.Datas(arr2);
-			}
-		},
-		AddOptions:function(event,index,type,data){
-//			console.log(index);
-//			console.log(type);
 		},
 		Num:function(index){
 			var num=0;
@@ -444,6 +431,7 @@
 			}
 		}
 		
+		
 		$("body").on("focus",".question-title-text",function(){
 			var oType=$(this).attr("type");
 			switch(oType){
@@ -506,13 +494,32 @@
 			}
 		})
 		
-		$("body").on("focus",".question-text",function(){
-			vm.BlurKey(false);
-			var oIndex=$(this).attr("index");
+		$("body").on("click",".question-text",function(){
+			var oCOIndex=vm.OptionIndex();
+			var oCIIndex=vm.ItemIndex();
+			var oIndex=Number($(this).attr("index"));
+			var oItemIndex=Number($(this).parent(".question-choice-option").parent(".question-options").attr("index"));
 			if($(this).text()===('选项'+(Number(oIndex)+1))){
 				$(this).text("");
 			}
+			
+			if(oCOIndex===-1&&oCIIndex===-1){
+
+			}else{
+				if(oCOIndex!==oIndex||oCIIndex!==oItemIndex){
+					$(".question-item").eq(vm.ItemIndex()).find(".question-options").find(".question-choice-option").eq(vm.OptionIndex()).find(".option-select").hide();
+				}
+			}
+			
 			$(this).next().show();
+			vm.OptionIndex(oIndex);
+			vm.ItemIndex(oItemIndex);
+		})
+		
+		$(document).on("click",function(e){
+			if(e.target.className!=="question-text"){
+				$(".option-select").hide();
+			}
 		})
 		
 		$("body").on("blur",".question-text",function(){
@@ -520,28 +527,71 @@
 			var oItemIndex=$(this).parent(".question-choice-option").parent(".question-options").attr("index");
 			if($(this).text()===""){
 				$(this).text('选项'+(Number(oIndex)+1));
-			}else{
-				Datas[Number(oItemIndex)].Options[Number(oIndex)].OptionContent=$(this).text();
-				vm.Datas([]);
-				vm.Datas(Datas);
 			}
-			$(this).next().hide();
-			vm.BlurKey(true);
 		})
 		
-		$("body").on("click",".option-type-delete",function(){
+		$("body").on("click",".option-type-delete",function(event){
 			var oIndex=$(this).attr("index");
 			var oItemIndex=$(this).parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index");
-			console.log(oItemIndex);
+			var oParent=$(this).parent(".option-select");
+			var oInput=$(this).parent(".option-select").prev();
+			console.log(Datas[Number(oItemIndex)].Options.length);
+			
 			if(Datas[Number(oItemIndex)].Options.length<=1){
+				oInput.focus();
 				vm.DialogShow(true);
 				vm.DeleteOptionShow(true);
 				$(".delete-tip").show();
 			}else{
 				Datas[Number(oItemIndex)].Options.splice(Number(oIndex),1);
-				$(this).parent(".option-select").parent(".question-choice-option").remove();
+				vm.Datas([]);
+				vm.Datas(Datas);
 			}
 		})
+		
+		$("body").on("click",".add-choice",function(){
+			var oItemIndex=$(this).attr("index");
+			console.log(oItemIndex);
+			var oType=$(this).attr("type");
+			var oTemplateOption={
+				"OptionId":0,
+				"OptionContent":"选项",
+				"OptionScore":3
+			}
+			
+			//深拷贝
+			var Datas2=$.extend(true,[],Datas);
+//			Datas2.splice(oItemIndex,0,oItem);
+			Datas2[Number(oItemIndex)].Options.push(oTemplateOption);
+			Datas=Datas2;
+			vm.Datas([]);
+			vm.Datas(Datas);
+			console.log(vm.Datas());
+		})
+		
+		$("body").on("input",".question-text",function(){
+			var oText=$(this).text();
+			var oIndex=$(this).attr("index");
+			var oItemIndex=$(this).parent(".question-choice-option").parent(".question-options").attr("index");
+			Datas[Number(oItemIndex)].Options[Number(oIndex)].OptionContent=oText;
+		})
+		
+//		$("body").on("click",".copy",function(){
+//			var oItemIndex=Number($(this).attr("index"));
+//			if(vm.ContinueCopy()){
+//				vm.ContinueCopy(false);
+//				var oItem=Datas[oItemIndex];
+//				oItem.QuestionId+=1;
+//				
+//				//深拷贝
+//				var Datas2=$.extend(true,[],Datas);
+//				Datas2.splice(oItemIndex,0,oItem)
+//				Datas=Datas2;
+//				vm.Datas([]);
+//				vm.Datas(Datas);
+//				vm.ContinueCopy(true);
+//			}
+//		})
 		
 	})
 </script>
