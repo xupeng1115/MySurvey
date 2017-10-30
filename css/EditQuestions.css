@@ -266,13 +266,12 @@ input{
     vertical-align: middle;
 }
 .content-box .content-right .question-box .question-item .question-options .question-choice-option .option-select-checkbox-box{
-	display:none;
 	position:relative;
 }
 .content-box .content-right .question-box .question-item .question-options .question-choice-option .option-select-checkbox-box input.option-select-checkbox{
 	height:30px;
 	width:120px;
-	padding:4px;
+	padding:6px 12px;
 	border:1px solid #ccc;
 	background:#fff;
 	border-radius:3px;
@@ -374,7 +373,7 @@ input[type=radio], input[type=checkbox] {
     margin-top: 1px \9;
     line-height: normal;
 }
-input[type=checkbox], input[type=radio], input[type=text] {
+input[type=checkbox], input[type=radio]{
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -425,7 +424,6 @@ input[type=checkbox]:checked:before {
 	margin-left:2px;
 }
 .content-box .content-right .question-box .question-item .question-options .question-choice-option .option-select .option-type-checkbox i.fa-check-square{
-	display:none;
 	color:#108cee;
 }
 .content-box .content-right .question-box .question-item .question-options .question-choice-option .option-select .option-type-checkbox i.fa-check-o{

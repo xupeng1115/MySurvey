@@ -48,7 +48,7 @@
                             <!-- ko if:(TypeId!==5) -->
                             <div class="question-item-title">
                                 <span class="question-item-id" data-bind="text:$parent.Num($index())"><!--Q1--></span>
-                                <div contenteditable="true" class="question-title-text input-hf" data-bind="style:{marginLeft:$index()<10?'40px':($index()%10<10?'45px':($index%100<10?'55px':($index()%1000<10?'65px':'80px')))},text:QuestionName,attr:{type:TypeId}"><!--单选题--></div>
+                                <div contenteditable="true" class="question-title-text input-hf" data-bind="style:{marginLeft:$index()<10?'40px':($index()%10<10?'45px':($index%100<10?'55px':($index()%1000<10?'65px':'80px')))},text:QuestionName,attr:{type:TypeId,index:$index()}"><!--单选题--></div>
                                 <span class="quesition-title-tip" style="display:none;">题干为空</span>
                             </div>
                             <!-- /ko -->
@@ -79,16 +79,16 @@
                                     <div contenteditable="true" class="question-text" data-bind="attr:{index:$index(),type:$parent.TypeId},text:OptionContent"></div>
                                     <ul class="option-select bor" contenteditable="false" style="display:none;">
                                         <li class="option-select-item option-type-checkbox" title="文本框" data-bind="attr:{index:$index()}">
-                                            <i class="fa fa-square-o" data-bind="click:$root.CheckboxEnable.bind($data,event,$index())" aria-hidden="true"></i>
-                                            <i class="fa fa-check-square" data-bind="click:$root.CheckboxDisable.bind($data,event,$index())" aria-hidden="true"></i>
+                                            <i class="fa fa-square-o" data-bind="visible:AllowWrite===0,click:$root.CheckboxEnable.bind($data,event,$index())" aria-hidden="true"></i>
+                                            <i class="fa fa-check-square" data-bind="visible:AllowWrite===1,click:$root.CheckboxDisable.bind($data,event,$index())" aria-hidden="true"></i>
                                         </li>
                                         <li class="option-select-item option-type-scroe" title="分值设置" data-bind="attr:{index:$index()},click:$root.OptionScoreSet.bind($data,event,$index())"></li>
                                         <li class="option-select-item option-type-delete" title="删除" data-bind="attr:{index:$index()}"></li>
-                                        <li class="option-select-item option-type-up" title="上移" data-bind="attr:{index:$index()}"></li>
-                                        <li class="option-select-item option-type-down" title="下移" data-bind="attr:{index:$index()}"></li>
+                                        <li class="option-select-item option-type-up" title="上移" data-bind="attr:{index:$index()},click:$root.Up.bind($data,event,$index())"></li>
+                                        <li class="option-select-item option-type-down" title="下移" data-bind="attr:{index:$index()},click:$root.Down.bind($data,event,$index())"></li>
                                     </ul>
-                                    <div class="option-select-checkbox-box">
-                                    	<input type="text" name="input" class="input-single option-select-checkbox form-control"/>
+                                    <div class="option-select-checkbox-box" data-bind="visible:AllowWrite===1">
+                                    	<input type="text" name="input" class="input-single option-select-checkbox form-control" autofocus="autofocus"/>
                                     </div>
                                 </li>
                             </ul>
@@ -144,14 +144,11 @@
                     <div class="close-btn" data-bind="click:DeleteClose"><i class="fa fa-times" aria-hidden="true"></i></div>
                 </div>
                 <div class="tip-content">
-                	<div class="item-score" data-bind="visible:!OptionScoreShow()" style="display:none;">
-                		<span>本道题目的分值为 </span>
-                    	<input type="text" data-bind="textInput:FormatScore" maxlength="5"/>
+                	<div class="item-score">
+                		<span data-bind="visible:!OptionScoreShow()" style="display:none;">本道题目的分值为 </span>
+                		<span data-bind="visible:OptionScoreShow" style="display:none;">本道选项的分值为 </span>
+                    	<input type="text" data-bind="textInput:FormatScore" maxlength="5" class="format-score" autofocus="autofocus"/>
                 	</div>
-                    <div class="option-score" data-bind="visible:OptionScoreShow" style="display:none;">
-                    	<span>本道选项的分值为 </span>
-                    	<input type="text" data-bind="textInput:FormatOptionScore" maxlength="5"/>
-                    </div>
                 </div>
                 <div class="tip-bottom">
                     <div class="confirm-btn confirm-score-btn tip-btn" data-bind="visible:!OptionScoreShow(),click:ScoreConfirm" style="display:none;">确定</div>
@@ -448,10 +445,13 @@
                 }
             });
         }
+        
+        var oTitle="呵呵呵";
+        var oDec="欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助！";
 
     </script>
     <script type="text/javascript">
-
+		
         var vm = {
             ItemIndex: ko.observable(-1),
             OptionIndex: ko.observable(-1),
@@ -467,10 +467,8 @@
             CurrentItem:ko.observable(),
             OptionScoreShow:ko.observable(false),
             CurrentOption:ko.observable(),
-            FormatOptionScore:ko.observable(0),
-            //CurrentId: ko.observable(Datas[0].QuestionId),
-            Title: ko.observable('哈哈哈'),
-            Dec: ko.observable('欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助！'),
+            Title: ko.observable(oTitle),
+            Dec: ko.observable(oDec),
             Lists: ko.observableArray(Lists),
             Datas: ko.observableArray(Datas),
             AddItem: function (event, type, data) {
@@ -576,13 +574,13 @@
             	console.log(index);
             	vm.CurrentItem(Number(oItemIndex));
             	vm.CurrentOption(index);
-            	vm.FormatOptionScore(data.OptionScore);
+            	vm.FormatScore(data.OptionScore);
             	vm.DialogShow(true);
             	vm.ScoreShow(true);
             	vm.OptionScoreShow(true);
             },
             OptionScoreConfirm:function(){
-            	var oScore=vm.FormatOptionScore();
+            	var oScore=vm.FormatScore();
             	var oItemIndex=vm.CurrentItem();
             	var oIndex=vm.CurrentOption();
             	
@@ -631,13 +629,77 @@
             },
             Up:function(event, index, data){
             	var oItemIndex = $(event.target).parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index");
-            	vm.CurrentItem(Number(oItemIndex));
-            	vm.CurrentOption(index);
+            	var oUpIndex;
+            	var oItem=Datas[Number(oItemIndex)];
+            	var oItemOption=Datas[Number(oItemIndex)].QuestionOptions[index];
+            	var oIndexContent=oItemOption.OptionContent;
+            	var oUpContent='';
+            	if(index!==0){
+            		oUpIndex=index-1;
+            		oUpContent=Datas[Number(oItemIndex)].QuestionOptions[oUpIndex].OptionContent;
+            		//深拷贝
+	                var Datas2 = $.extend(true, [], Datas);
+	                Datas2[Number(oItemIndex)].QuestionOptions.splice(index, 1);
+	                Datas2[Number(oItemIndex)].QuestionOptions.splice(oUpIndex, 0, oItemOption);
+	                if(oIndexContent===("选项"+(index+1))){
+	                	Datas2[Number(oItemIndex)].QuestionOptions[oUpIndex].OptionContent="选项"+(oUpIndex+1);
+	                }
+	                if(oUpContent===("选项"+(oUpIndex+1))){
+	                	console.log(oUpContent);
+	                	Datas2[Number(oItemIndex)].QuestionOptions[index].OptionContent="选项"+(index+1);
+	                }
+	                for(var j=0;j<Datas2[Number(oItemIndex)].QuestionOptions.length;j++){
+	                	Datas2[Number(oItemIndex)].QuestionOptions[j].DisplayOrder=j;
+	                	Datas2[Number(oItemIndex)].QuestionOptions[j].OptionId=j;
+	                	if(Datas2[Number(oItemIndex)].QuestionOptions[j].OptionContent==""){
+	                		Datas2[Number(oItemIndex)].QuestionOptions[j].OptionContent="选项"+(j+1);
+	                	}
+	                }
+	                Datas = Datas2;
+	                console.log(Datas);
+                    vm.Datas([]);
+                    vm.Datas(Datas);
+                    
+                    //ajax请求
+//              	Save(oItem,index,oUpIndex);		//oItem:移动的题目，oId:开始的位置,oIndex:最后放置的位置
+            	}
+            	
             },
             Down:function(event, index, data){
             	var oItemIndex = $(event.target).parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index");
-            	vm.CurrentItem(Number(oItemIndex));
-            	vm.CurrentOption(index);
+            	var oDownIndex;
+            	var oItem=Datas[Number(oItemIndex)];
+            	var oItemOption=Datas[Number(oItemIndex)].QuestionOptions[index];
+				var oIndexContent=oItemOption.OptionContent;
+            	var oDownContent='';
+            	if(index!==(oItem.QuestionOptions.length-1)){
+            		oDownIndex=index+1;
+            		oDownContent=Datas[Number(oItemIndex)].QuestionOptions[oDownIndex].OptionContent;
+            		//深拷贝
+	                var Datas2 = $.extend(true, [], Datas);
+	                Datas2[Number(oItemIndex)].QuestionOptions.splice(index, 1);
+	                Datas2[Number(oItemIndex)].QuestionOptions.splice(oDownIndex, 0, oItemOption);
+	                if(oIndexContent===("选项"+(index+1))){
+	                	Datas2[Number(oItemIndex)].QuestionOptions[oDownIndex].OptionContent="选项"+(oDownIndex+1);
+	                }
+	                if(oDownContent===("选项"+(oDownIndex+1))){
+	                	Datas2[Number(oItemIndex)].QuestionOptions[index].OptionContent="选项"+(index+1);
+	                }
+	                for(var j=0;j<Datas2[Number(oItemIndex)].QuestionOptions.length;j++){
+	                	Datas2[Number(oItemIndex)].QuestionOptions[j].DisplayOrder=j;
+	                	Datas2[Number(oItemIndex)].QuestionOptions[j].OptionId=j;
+	                	if(Datas2[Number(oItemIndex)].QuestionOptions[j].OptionContent==""){
+	                		Datas2[Number(oItemIndex)].QuestionOptions[j].OptionContent="选项"+(j+1);
+	                	}
+	                }
+	                Datas = Datas2;
+	                console.log(Datas);
+                    vm.Datas([]);
+                    vm.Datas(Datas);
+                    
+                    //ajax请求
+//              	Save(oItem,index,oDownIndex);		//oItem:移动的题目，oId:开始的位置,oIndex:最后放置的位置
+				}
             },
             Num: function (index) {
                 var num = 0;
@@ -673,13 +735,6 @@
 			}
 		},vm)
 		
-		vm.FormatOptionScore.subscribe(function(newValue){
-			if(isNaN(parseInt(newValue))){
-				this.FormatOptionScore(0);
-			}else{
-				this.FormatOptionScore(parseInt(newValue));
-			}
-		},vm)
         ko.applyBindings(vm);
 
         $(document).ready(function () {
@@ -815,7 +870,7 @@
                 }
             })
 
-            $("body").on("click", ".question-text", function () {
+            $("body").on("focus", ".question-text", function () {
                 var oCOIndex = vm.OptionIndex();
                 var oCIIndex = vm.ItemIndex();
                 var oIndex = Number($(this).attr("index"));
@@ -851,7 +906,7 @@
                 if ($(this).text() === "") {
                     $(this).text('选项' + (Number(oIndex) + 1));
                 }
-                
+                console.log($(this).text());
                 var QuestionItem=Datas[Number(oItemIndex)];
                 
                 //判断重复项
@@ -877,6 +932,34 @@
                 
                 //ajax请求
 //             	Save(QuestionItem);		//QuestionItem:失去焦点的题目对象
+            })
+            
+            $("body").on("blur", ".question-title", function () {
+                var oTitleText= vm.Title();
+               	if(oTitleText!==oTitle){
+               		//ajax请求
+//             		Save(oTitleText);		//QuestionItem:失去焦点的题目对象
+               	}
+            })
+
+			$("body").on("blur", ".question-dec", function () {
+                var oDecText= vm.Dec();
+               	if(oDecText!==oDec){
+               		//ajax请求
+//             		Save(oDecText);		//QuestionItem:失去焦点的题目对象
+               	}
+            })
+
+			$("body").on("blur", ".question-title-text", function () {
+                var oQuestionTitle= $(this).text();
+                var oIndex=$(this).attr("index");
+				console.log(Datas[Number(oIndex)]);
+               	if(oQuestionTitle!==Datas[Number(oIndex)].QuestionName){
+               		Datas[Number(oIndex)].QuestionName=oQuestionTitle;
+               		vm.Datas(Datas);
+               		//ajax请求
+//             		Save(Datas[Number(oIndex)]);		//Datas[Number(oIndex)]:失去焦点的题目对象
+               	}
             })
 
             $("body").on("click", ".option-type-delete", function (event) {
