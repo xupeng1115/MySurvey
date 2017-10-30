@@ -369,6 +369,20 @@
 		}
 	},vm)
 	
+	//可写的计算监控属性
+	vm.FormatScore=ko.pureComputed({
+		read:function(){
+			return this.Score();
+		},
+		write:function(value){
+			var lastSpacePos=value.lastIndexOf(" ");
+			if(lastSpacePos>0){
+				this.First(value.substring(0,lastSpacePos));
+				this.Last(value.substring(lastSpacePos+1));
+			}
+		}
+	},vm)
+	
 	ko.applyBindings(vm);
 
 	$(document).ready(function(){
