@@ -9,6 +9,7 @@ html,body{
 	display:block;
 	position:relative;
 	font-size:14px;
+	background:#e2e5ec;
 }
 .clearfix{
 	visibility:hidden;
@@ -41,6 +42,8 @@ ul{
 }
 .container-fluid {
   	padding:0;
+  	position:relative;
+  	background:#e2e5ec;
 }
 .bor{
     border: 1px solid #dbdbdb;
@@ -61,10 +64,11 @@ input{
 .content{
 	width:980px;
     box-shadow: 0 0 12px rgba(0,0,0,.1);
-    padding: 40px 20px;
-    margin:70px auto;
+    padding: 40px 20px 100px 20px;
+    margin:80px auto;
     margin-bottom: 100px;
     position: relative;
+    background:#fff;
 }
 .content .clip-img{
 	width:33px;
@@ -84,6 +88,7 @@ input{
 	padding: 3px 20px;
     line-height: 30px;
     margin-top:20px;
+    margin-bottom: 20px;
     font-size: 14px;
     word-break: break-all;
     word-wrap: break-word;
@@ -117,11 +122,70 @@ input{
 .question-box .select-box .select-item:hover{
 	background:#f1f5fd;
 }
-.question-box .select-box .select-item .question-radio{
-	display: block;
+.question-box .select-box .select-item .question-input{
 	float:left;
-    outline: none;
-    margin-top:2px;
+	height: 16px;
+    width: 16px;
+    display: inline-block;
+    margin-top: 2px;
+    cursor: pointer;
+    vertical-align: middle;
+    border:1px solid #6573cc;
+    position:relative;
+}
+.question-box .select-box .select-item .question-radio{
+    border-radius:100px;
+}
+.question-box .select-box .select-item .question-radio .question-radio-circle{
+	display:none;
+	width:10px;
+	height:10px;
+	background:#6573cc;
+	border-radius:100%;
+	position:absolute;
+	top:2px;
+	left:2px;
+}
+.question-box .select-box .select-item .question-checkbox{
+    border-radius:2px;
+}
+.question-box .select-box .select-item .question-checkbox .question-checkbox-active{
+	display:none;
+	top: 3px;
+    left: 2px;
+    width: 10px;
+    height: 6px;
+    content: '';
+    color: #fff;
+    position: absolute;
+    border-bottom: solid 2px currentColor;
+    border-left: solid 2px currentColor;
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+.question-box .select-box .select-input{
+	display:block;
+	width:200px;
+	height:30px;
+	margin:10px 0 10px 40px;
+	border:1px solid #ccc;
+}
+.question-box .select-box .select-item .select-input{
+	margin:10px 0 10px 30px;
+}
+.question-box .select-box .select-input:focus{
+	border:1px solid #6573cc;
+}
+.question-box .select-box textarea{
+	display:block;
+	width: 340px;
+    height: 132px;
+	margin:10px 0 10px 40px;
+	border:1px solid #ccc;
+	outline:none;
+}
+.question-box .select-box textarea:focus{
+	border:1px solid #6573cc;
 }
 input[type=checkbox], input[type=radio] {
     -webkit-box-sizing: border-box;
@@ -149,7 +213,28 @@ input[type=radio] {
     -moz-border-radius: 100px;
     border-radius: 100px;
 }
+input[type=checkbox] {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+    outline: 0;
+    cursor: pointer;
+    vertical-align: -2px;
+    border: 1px solid #6573cc;
+    -webkit-appearance: none;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+}
 input[type=radio]:checked:before {
+    background-color: #6573cc;
+}
+input[type=checkbox]:checked:before {
+    background-color: #6573cc;
+}
+input[type=checkbox]:checked{
     background-color: #6573cc;
 }
 input[type=radio]:before {
@@ -163,7 +248,65 @@ input[type=radio]:before {
     -moz-border-radius: 100px;
     border-radius: 100px;
 }
+input[type=checkbox]:checked:before {
+    top: 3px;
+    left: 2px;
+    width: 10px;
+    height: 6px;
+    content: '';
+    color: #fff;
+    position: absolute;
+    border-bottom: solid 2px currentColor;
+    border-left: solid 2px currentColor;
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+input[type=text]:focus{
+	border: 1px solid #6573cc;
+}
 .question-box .select-box .select-item .select-text{
 	width:870px;
 	margin-left:30px;
+}
+.question-box .question-item .dec-text{
+	width: 940px;
+    margin: 0 auto;
+    padding: 3px 20px;
+    line-height: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    word-break: break-all;
+    word-wrap: break-word;
+    color: #666;
+    background-color: #f1f5fd;
+}
+/*********************进度条**********************/
+.survey-progress-bar{
+	width: 200px;
+    height: 14px;
+    background-color: #d5d5d5;
+    position: fixed;
+    top: 280px;
+    bottom: auto;
+    left: 50%;
+    margin-left: 500px;
+    z-index: 1000;
+    -webkit-transform-origin: bottom left;
+    -moz-transform-origin: bottom left;
+    -ms-transform-origin: bottom left;
+    transform-origin: bottom left;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
+.survey-progress-bar .survey-progress-active{
+	height:14px;
+	background:#6573cc;
+	color: #fff;
+    text-align: right;
+    line-height: 100%;
+    font-size:14px;
 }

@@ -17,55 +17,355 @@
 	
 </head>
 <body>
-	<div class="container-fluid">
-		<div class="content">
-			<img src="img/paper_clip.png" class="clip-img"/>
-			<div class="row title">呵呵呵呵</div>
-			<div class="row dec">
-				<div class="dec-text">欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助!</div>
-				<div class="tip-text">声明：百度不会以任何理由索要您的账号、密码、身份等敏感信息，请确认邀请人是否可靠，防止个人信息泄露</div>
-			</div>
-			<div class="question-box">
-				<div class="row question-item">
-					<div class="row item-top">1. 单选题</div>
-					<div class="row select-box">
-						<div class="row select-item">
-							<input type="radio" name="radio" class="question-radio"/>
-							<div class="select-text">选项1</div>
+<div class="container-fluid">
+	<div class="content">
+		<img src="img/paper_clip.png" class="clip-img"/>
+		<div class="row title" data-bind="text:Title"><!--呵呵呵呵--></div>
+		<div class="row dec">
+			<div class="dec-text" data-bind="text:Dec"><!--欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助!--></div>
+			<div class="tip-text">声明：百度不会以任何理由索要您的账号、密码、身份等敏感信息，请确认邀请人是否可靠，防止个人信息泄露</div>
+		</div>
+		<div class="question-box" data-bind="foreach:Datas">
+			
+			<div class="row question-item" data-bind="attr:{index:$index(),type:TypeId}">
+				<!-- ko if:(TypeId!==5) -->
+				<div class="row item-top">
+					<span class="item-index" data-bind="text:$parent.Num($index())"><!--1.--></span>
+					<span class="item-title" data-bind="text:QuestionName"><!--单选题--></span> 
+				</div>
+				<!-- /ko -->
+				<!-- ko if:(TypeId===5) -->
+				<div class="dec-text" data-bind="text:QuestionName"><!--描述说明--></div>
+				<!-- /ko -->
+				<!-- ko if:(TypeId===1||TypeId===2) -->
+				<div class="row select-box" data-bind="foreach:QuestionOpions,attr:{index:$index()}">
+					<div class="row select-item" data-bind="attr:{index:$index(),check:0},click:$root.HandleItem.bind($data,event,$index())">
+						<!-- ko if:($parent.TypeId===1) -->
+						<div class="question-input question-radio">
+							<div class="question-radio-circle"></div>
 						</div>
-						<div class="row select-item">
-							<input type="radio" name="radio" class="question-radio"/>
-							<div class="select-text">选项1</div>
+						<!-- /ko -->
+						<!-- ko if:($parent.TypeId===2) -->
+						<div class="question-input question-checkbox">
+							<div class="question-checkbox-active"></div>
 						</div>
+						<!-- /ko -->
+						<div class="select-text" data-bind="text:OptionContent"><!--选项1--></div>
+						<input type="text" name="text" class="select-input" data-bind="visible:AllowWrite===1" style="display:none;"/>
 					</div>
 				</div>
-				<div class="row question-item">
-					<div class="item-top">2. 多选题</div>
-					<div class="row select-box">
-						<div class="row select-item"></div>
-						<div class="row select-item"></div>
-					</div>
+				<!-- /ko -->
+				
+				<!-- ko if:(TypeId===3) -->
+				<div class="row select-box">
+					<input type="text" name="text" class="select-input question-item-input" data-bind="attr:{index:$index()},click:$root.HandleForm.bind($data,event,$index())"/>
 				</div>
-				<div class="row question-item">
-					<div class="item-top">3. 单行问答题</div>
+				<!-- /ko -->
+				<!-- ko if:(TypeId===4) -->
+				<div class="row select-box">
+					<textarea name="textarea" class="question-item-input" data-bind="attr:{index:$index()},click:$root.HandleForm.bind($data,event,$index())"></textarea>
 				</div>
-				<div class="row question-item">
-					<div class="item-top">4. 多行问答题</div>
-				</div>
-				<div class="row question-item">
-					<div class="dec-text"></div>
-				</div>
+				<!-- /ko -->
 			</div>
 		</div>
 	</div>
+	<div class="survey-progress-bar">
+		<div class="survey-progress-active" style="display:none;" data-bind="style:{width:((Progress().length)/FormatItemLength()*100)+'%'},visible:Progress().length>0,text:((Progress().length)/FormatItemLength()*100)>=16?((Progress().length)/FormatItemLength()*100)+'%':''"><!--20%--></div>
+	</div>
+</div>
 
 <script type="text/javascript" src="js/knockout.min.js"></script>
 <script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
-
+<script>
+	var Title="呵呵呵呵";
+	var Dec="欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助!";
+	var Datas=[
+			{
+				"CreateDate":"/Date(1509501875783)/",
+				"CreateUserId":1,
+				"DisplayMode":0,
+				"DisplayOrder":1,
+				"MaxOption":0,
+				"MinOption":0,
+				"MustFill":1,
+				"OptionCode":0,
+				"QuestionId":281,
+				"QuestionName":"1111111111111111111111",
+				"QuestionnaireId":19,
+				"Score":0,
+				"TypeId":1,
+				"UpdateDate":"/Date(1509502672837)/",
+				"UpdateUserId":0,
+				"QuestionOpions":[
+					{
+						"AllowWrite":1,
+						"DisplayOrder":1,
+						"OptionContent":"选项1",
+						"OptionId":1,
+						"OptionScore":0,
+					},
+					{
+						"AllowWrite":0,
+						"DisplayOrder":2,
+						"OptionContent":"选项2",
+						"OptionId":2,
+						"OptionScore":0,
+					}
+				]
+			},
+			{
+				"CreateDate":"/Date(1509501875783)/",
+				"CreateUserId":2,
+				"DisplayMode":0,
+				"DisplayOrder":2,
+				"MaxOption":0,
+				"MinOption":0,
+				"MustFill":1,
+				"OptionCode":0,
+				"QuestionId":2,
+				"QuestionName":"速度发了四度空间",
+				"QuestionnaireId":19,
+				"Score":0,
+				"TypeId":2,
+				"UpdateDate":"/Date(1509502672837)/",
+				"UpdateUserId":0,
+				"QuestionOpions":[
+					{
+						"AllowWrite":1,
+						"DisplayOrder":1,
+						"OptionContent":"选项1",
+						"OptionId":1,
+						"OptionScore":0,
+					},
+					{
+						"AllowWrite":1,
+						"DisplayOrder":2,
+						"OptionContent":"选项2",
+						"OptionId":2,
+						"OptionScore":0,
+					}
+				]
+			},
+			{
+				"CreateDate":"/Date(1509501875783)/",
+				"CreateUserId":1,
+				"DisplayMode":0,
+				"DisplayOrder":3,
+				"MaxOption":0,
+				"MinOption":0,
+				"MustFill":1,
+				"OptionCode":0,
+				"QuestionId":91,
+				"QuestionName":"了斯柯达来了",
+				"QuestionnaireId":19,
+				"Score":0,
+				"TypeId":3,
+				"UpdateDate":"/Date(1509502672837)/",
+				"UpdateUserId":0,
+				"QuestionOpions":"",
+			},
+			{
+				"CreateDate":"/Date(1509501875783)/",
+				"CreateUserId":1,
+				"DisplayMode":0,
+				"DisplayOrder":4,
+				"MaxOption":0,
+				"MinOption":0,
+				"MustFill":1,
+				"OptionCode":0,
+				"QuestionId":771,
+				"QuestionName":"sldfsdfskjkl",
+				"QuestionnaireId":19,
+				"Score":0,
+				"TypeId":4,
+				"UpdateDate":"/Date(1509502672837)/",
+				"UpdateUserId":0,
+				"QuestionOpions":""
+			},
+			{
+				"CreateDate":"/Date(1509501875783)/",
+				"CreateUserId":1,
+				"DisplayMode":0,
+				"DisplayOrder":5,
+				"MaxOption":0,
+				"MinOption":0,
+				"MustFill":1,
+				"OptionCode":0,
+				"QuestionId":281,
+				"QuestionName":"大范甘迪发了个空地方了大发了个快递费的道德观fgdlfgdlfgkdflgkdlfkgdflgkd两个看到了疯狂",
+				"QuestionnaireId":19,
+				"Score":0,
+				"TypeId":5,
+				"UpdateDate":"/Date(1509502672837)/",
+				"UpdateUserId":0,
+				"QuestionOpions":""
+			},
+			{
+				"CreateDate":"/Date(1509501875783)/",
+				"CreateUserId":2,
+				"DisplayMode":0,
+				"DisplayOrder":6,
+				"MaxOption":0,
+				"MinOption":0,
+				"MustFill":1,
+				"OptionCode":0,
+				"QuestionId":6677,
+				"QuestionName":"lsdjfslkfls",
+				"QuestionnaireId":19,
+				"Score":0,
+				"TypeId":2,
+				"UpdateDate":"/Date(1509502672837)/",
+				"UpdateUserId":0,
+				"QuestionOpions":[
+					{
+						"AllowWrite":1,
+						"DisplayOrder":1,
+						"OptionContent":"选项1",
+						"OptionId":1,
+						"OptionScore":0,
+					},
+					{
+						"AllowWrite":1,
+						"DisplayOrder":2,
+						"OptionContent":"选项2",
+						"OptionId":2,
+						"OptionScore":0,
+					}
+				]
+			},
+		]
+	
+</script>
 <script type="text/javascript">
+	
+	var vm={
+		Title:Title,
+		Dec:Dec,
+		Datas:ko.observableArray(Datas),
+		Progress:ko.observableArray([]),
+		CurrentVal:ko.observable(""),
+		Num: function (index) {
+            var num = 0;
+            for (var i = 0; i < vm.Datas().length; i++) {
+                if (i <= index) {
+                    if (vm.Datas()[i].TypeId !== 5) {
+                        num++;
+                    }
+                } else {
+                    break;
+                }
+            }
+            return num + ".";
+        },
+        HandleItem:function(event, index, data){
+        	var oQuestion=$(event.target).parents(".question-item");
+        	var oType=Number(oQuestion.attr("type"));
+        	var oIndex=Number(oQuestion.attr("index"));
+        	var oInputs=$(event.target).parents(".select-box").find(".select-item");
+        	var oKey=Number(oInputs.eq(index).attr("check"));
+        	
+        	vm.Change(event.target);
+        	
+        	var oLen=0;
+        	if(oType===1){
+        		if(oKey===0){
+	        		for(var i=0;i<oInputs.length;i++){
+	        			if(oInputs.eq(i).attr("check")==="1"){
+	        				oInputs.eq(i).attr("check","0").find(".question-radio").find(".question-radio-circle").hide();
+	        				oLen+=1;
+	        				break;
+	        			}
+	        		}
+	        		if(oLen===0){
+	        			vm.Progress.push(oIndex);
+	        		}
+	        		oInputs.eq(index).attr("check","1").find(".question-radio").find(".question-radio-circle").show();
+        		}else{
+        			
+        		}
+        	}
+        	
+        	if(oType===2){
+        		if(oKey===0){
+	        		for(var i=0;i<oInputs.length;i++){
+	        			if(oInputs.eq(i).attr("check")==="1"){
+	        				oLen+=1;
+	        				break;
+	        			}
+	        		}
+	        		if(oLen===0){
+	        			vm.Progress.push(oIndex);
+	        		}
+	        		oInputs.eq(index).attr("check","1").find(".question-checkbox").css("background","#6573cc").find(".question-checkbox-active").show();
+					
+        		}else{
+        			oInputs.eq(index).attr("check","0").find(".question-checkbox").css("background","transparent").find(".question-checkbox-active").hide();
+        			for(var i=0;i<oInputs.length;i++){
+	        			if(oInputs.eq(i).attr("check")==="1"){
+	        				oLen+=1;
+	        				break;
+	        			}
+	        		}
+	        		if(oLen===0){
+	        			var oId=vm.Progress().indexOf(oIndex);
+	        			vm.Progress.splice(oId,1);
+	        		}
+        		}
+        	}
+        },
+        HandleForm:function(event, index, data){
+        	vm.Change(event.target);
+        },
+        Change:function(target){
+        	var oIndex=$(target).parents(".question-item");
+        	oIndex.siblings().find(".item-top").css({
+        		"background":"#eee",
+        		"color":"#666"
+        	})
+        	oIndex.find(".item-top").css({
+        		"background":"#6573cc",
+        		"color":"#fff"
+        	})
+        },
+        FormatPercent:function(){
+        	
+        }
+	}
+	
+	vm.FormatItemLength=ko.pureComputed(function(){
+		var arr=0;
+		for(var i=0;i<vm.Datas().length;i++){
+			if(vm.Datas()[i].TypeId!==5){
+				arr++;
+			}
+		}
+		return arr;
+	})
+	
+	ko.applyBindings(vm);
+	
 	$(function(){
-		
+		$("body").on("focus",".question-item-input",function(){
+			vm.CurrentVal($(this).val());
+		})
+		$("body").on("blur",".question-item-input",function(){
+			var oIndex=Number($(this).attr("index"));
+			if(vm.CurrentVal()!=""){
+				if($(this).val()==""){
+					var oId=vm.Progress().indexOf(oIndex);
+					vm.Progress.splice(oId,1);
+				}else{
+					
+				}
+			}else{
+				if($(this).val()!=""){
+					vm.Progress.push(oIndex);
+				}else{
+					
+				}
+			}
+		})
 	})
 </script>
 
