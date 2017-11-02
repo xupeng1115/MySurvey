@@ -16,6 +16,7 @@
     <script src="js/jquery-ui.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/knockout.min.js"></script>
+    
 
 </head>
 <body>
@@ -157,8 +158,21 @@
             </div>
         </div>
     </div>
-
+	<script src="js/communication.js"></script>
     <script>
+    	function getAjax(){
+    		var options={
+	    		"controller":"test.json",
+	    	}
+	    	var successFun=function(result){
+	    		console.log(result);
+	    	}
+	    	var errorFun=function(){
+	    		console.log("错误");
+	    	}
+	    	communication.get(options,successFun,errorFun);
+    	}
+    	getAjax();
         var questionnaireId = $("#txt_QuestionnaireId").val();
         var requestUrl = {
             QuestionnaireUrl: '../Question/Questionnaire',                // '/knx/Question/Questionnaire',
