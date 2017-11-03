@@ -1,34 +1,46 @@
 
+@{
+    Layout = null;
+    var QuestionnaireId = ViewBag.QuestionnaireId;
+    var QuestionnaireName = ViewBag.QuestionnaireName == null ? "" : ViewBag.QuestionnaireName;
+    var QuestionnaireDesc = ViewBag.QuestionnaireDesc == null ? "" : ViewBag.QuestionnaireDesc;
+    var lstQstTyoe = ViewBag.questionType == null ? null : ViewBag.questionType as Array;
+
+}
+
 <!DOCTYPE html>
 
 <html>
 <head>
-	<meta charset="utf-8" />
+    <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width" />
     <title>EditQuestions</title>
-    
-    <link href="css/bootstrap.min.css" rel="stylesheet" />
-    <link href="css/font-awesome.min.css" rel="stylesheet" />
-    <link href="css/EditQuestions.css?v=20171027" rel="stylesheet" />
+    @* @Scripts.Render("~/Scripts/Qustion/EditQuestions.js?v=20170817")*@
 
-    <script src="js/jquery-1.11.3.min.js"></script>
-    <script src="js/jquery-ui.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/knockout.min.js"></script>
-    
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Question/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/Question/css/EditQuestions.css?v=20171103" rel="stylesheet" />
+
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery-ui.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/knockout-3.4.2.js"></script>
+    <script src="~/Scripts/communication.js"></script>
 
 </head>
 <body>
     <div style="display:none">
-        <input type="hidden" id="txt_QuestionnaireId" value="7" />
-        <input type="hidden" id="txt_QuestionnaireName" value="tttttttt" />
+        <input type="hidden" id="txt_QuestionnaireId" value="@QuestionnaireId" />
+        <input type="hidden" id="txt_QuestionnaireName" value="@QuestionnaireName" />
+        <input type="hidden" id="txt_QuestionnareDesc" value="@QuestionnaireDesc" />
+        <input type="hidden" id="txt_lstType" value="@lstQstTyoe"/>
     </div>
 
     <div class="container-fluid">
         <div class="row content">
             <div class="row top">
-                <div class="col-md-1 top-survey-btn survey-btn">预览问卷</div>
+                <div class="col-md-1 top-survey-btn survey-btn" data-bind="click:SurveyView">预览问卷</div>
             </div>
             <div class="row content-box">
                 <div class="col-md-2 content-left bor">
@@ -38,7 +50,7 @@
                     </div>
                 </div>
                 <div class="col-md-9 content-right">
-                    <input type="text" class="question-title bor input-hf" data-bind="textInput:Title" maxlength="18" />
+                    <input type="text" class="question-title bor input-hf" data-bind="textInput:Title" maxlength="100" />
                     <div class="question-title-empty tip red" data-bind="visible:EmptyTitle" style="display:none;">问卷名称不能为空</div>
                     <div class="row question-dec-box bor">
                         <div contenteditable="true" class="question-dec input-hf" data-bind="text:Dec"></div>
@@ -48,19 +60,20 @@
                         <div class="row question-item bor" data-bind="attr:{id:$index(),index:$index()}">
                             <!-- ko if:(TypeId!==5) -->
                             <div class="question-item-title">
+                                <span class="question-mast-fill" data-bind="visible:MustFill===1" style="display:none;">*</span>
                                 <span class="question-item-id" data-bind="text:$parent.Num($index())"><!--Q1--></span>
-                                <div contenteditable="true" class="question-title-text input-hf" data-bind="style:{marginLeft:$index()<10?'40px':($index()%10<10?'45px':($index%100<10?'55px':($index()%1000<10?'65px':'80px')))},text:QuestionName,attr:{type:TypeId,index:$index()}"><!--单选题--></div>
+                                <div contenteditable="true" class="question-title-text input-hf" data-bind="style:{marginLeft:$index()<9?'40px':(9<=$index()<100?'45px':(100<=$index<1000?'55px':(1000<=$index()<10000?'65px':'80px')))},text:QuestionName,attr:{type:TypeId,index:$index()}"><!--单选题--></div>
                                 <span class="quesition-title-tip" style="display:none;">题干为空</span>
                             </div>
                             <!-- /ko -->
                             <!-- ko if:(TypeId===5) -->
                             <div class="dec-input-box">
-                                <div contenteditable="true" class="dec-input question-title-text input-hf" data-bind="text:QuestionName,attr:{type:TypeId}"><!--描述说明--></div>
+                                <div contenteditable="true" class="dec-input question-title-text input-hf" data-bind="text:QuestionName,attr:{type:TypeId,index:$index()}"><!--描述说明--></div>
                             </div>
                             <!-- /ko -->
                             <!-- ko if:(TypeId===3) -->
                             <div class="single-box">
-                                <input type="text" name="input" class="input-single form-control" />
+                                <input type="text" class="input-single form-control" />
                             </div>
                             <!-- /ko -->
                             <!-- ko if:(TypeId===4) -->
@@ -80,42 +93,41 @@
                                     <div contenteditable="true" class="question-text" data-bind="attr:{index:$index(),type:$parent.TypeId},text:OptionContent"></div>
                                     <ul class="option-select bor" contenteditable="false" style="display:none;">
                                         <li class="option-select-item option-type-checkbox" title="文本框" data-bind="attr:{index:$index()}">
-                                            <i class="fa fa-square-o" data-bind="visible:AllowWrite===0,click:$root.CheckboxEnable.bind($data,event,$index())" aria-hidden="true"></i>
-                                            <i class="fa fa-check-square" data-bind="visible:AllowWrite===1,click:$root.CheckboxDisable.bind($data,event,$index())" aria-hidden="true"></i>
+                                            <i class="fa fa-square-o" data-bind="visible:AllowWrite===0,click:$root.CheckboxShow.bind($data,event,$index())" aria-hidden="true" style="display:none;"></i>
+                                            <i class="fa fa-check-square" data-bind="visible:AllowWrite===1,click:$root.CheckboxShow.bind($data,event,$index())" aria-hidden="true" style="display:none;"></i>
                                         </li>
-                                        <li class="option-select-item option-type-scroe" title="分值设置" data-bind="attr:{index:$index()},click:$root.OptionScoreSet.bind($data,event,$index())"></li>
-                                        <li class="option-select-item option-type-delete" title="删除" data-bind="attr:{index:$index()}"></li>
-                                        <li class="option-select-item option-type-up" title="上移" data-bind="attr:{index:$index()},click:$root.Up.bind($data,event,$index())"></li>
-                                        <li class="option-select-item option-type-down" title="下移" data-bind="attr:{index:$index()},click:$root.Down.bind($data,event,$index())"></li>
+                                        <li class="option-select-item option-type-scroe" title="选项设置" data-bind="attr:{index:$index()},click:$root.OptionSet.bind($data,event,$index())"></li>
+                                        <li class="option-select-item option-type-delete" title="删除" data-bind="attr:{index:$index()},click:$root.DeleteOption.bind($data,event,$index())"></li>
+                                        <li class="option-select-item option-type-up" title="上移" data-bind="attr:{index:$index(),type:'up'},click:$root.Move.bind($data,event,$index())"></li>
+                                        <li class="option-select-item option-type-down" title="下移" data-bind="attr:{index:$index(),type:'down'},click:$root.Move.bind($data,event,$index())"></li>
                                     </ul>
-                                    <div class="option-select-checkbox-box" data-bind="visible:AllowWrite===1">
-                                    	<input type="text" name="input" class="input-single option-select-checkbox form-control" autofocus="autofocus"/>
+                                    <div class="option-select-checkbox-box"data-bind="visible:AllowWrite===1" style="display:none;">
+                                        <input type="text" class="input-single option-select-checkbox form-control"/>
                                     </div>
                                 </li>
                             </ul>
                             <!-- /ko -->
                             <!-- ko if:(TypeId===1||TypeId===2) -->
                             <div class="add-area">
-                                <div class="add-choice" title="增加" data-bind="attr:{index:$index(),type:TypeId}"></div>
-                                <div class="batch-add-choice" title="批量增加" data-bind="attr:{index:$index(),type:TypeId}"></div>
+                                <div class="add-choice" title="增加" data-bind="attr:{index:$index(),type:TypeId},click:$parent.AddOption.bind($data,event,$index())"></div>
+                                <div class="batch-add-choice" title="批量增加" data-bind="attr:{index:$index(),type:TypeId},click:$parent.BatchAddOption.bind($data,event,$index())"></div>
                             </div>
                             <!-- /ko -->
                             <div class="operate">
                                 <div class="delete operate-type" title="删除" data-bind="attr:{index:$index(),type:TypeId},click:$parent.Delete.bind($data,event,$index())"></div>
                                 <!-- ko if:(TypeId!==5) -->
-                                <div class="scroe operate-type" title="分值设置" data-bind="attr:{index:$index(),type:TypeId},click:$parent.ScoreSet.bind($data,event,$index())"></div>
+                                <div class="scroe operate-type" title="题目设置" data-bind="attr:{index:$index(),type:TypeId},click:$parent.QuestionSet.bind($data,event,$index())"></div>
                                 <!-- /ko -->
                                 <div class="copy operate-type" title="复制" data-bind="attr:{index:$index(),type:TypeId},click:$parent.Copy.bind($data,event,$index())"></div>
-                                <!-- ko if:(TypeId===1||TypeId===2) -->
-                                <div class="show-type operate-type" title="显示方式" data-bind="attr:{index:$index(),type:TypeId}"></div>
+                                <!-- ko if:(TypeId===6) -->
+                                <div class="option-set operate-type" title="设置" data-bind="attr:{index:$index(),type:TypeId},click:$parent.QuestionSet.bind($data,event,$index())"></div>
                                 <!-- /ko -->
                                 <div class="drag operate-type" title="移动" data-bind="attr:{index:$index(),type:TypeId}"></div>
                             </div>
-                            <div class="save-btn">保存</div>
                         </div>
                     </div>
                     <div class="row question-bottom bor">
-                        <div class="bottom-survey-btn survey-btn">预览问卷</div>
+                        <div class="bottom-survey-btn survey-btn" data-bind="click:SurveyView">预览问卷</div>
                     </div>
                 </div>
             </div>
@@ -125,66 +137,103 @@
         <div class="dialog" data-bind="visible:DialogShow" style="display:none;">
             <div class="delete-tip tip-box" data-bind="visible:DeleteShow" style="display:none;">
                 <div class="tip-top">
-                    <span class="tip-title">操作提示</span>
+                    <span class="tip-title">删除提示</span>
                     <div class="close-btn" data-bind="click:DeleteClose"><i class="fa fa-times" aria-hidden="true"></i></div>
                 </div>
                 <div class="tip-content">
-                    <img src="img/warning_icon.png" />
-                    <span class="delete-option-text" data-bind="visible:DeleteOptionShow" style="display:none;">选项个数不能为0</span>
-                    <span class="delete-text" data-bind="visible:DeleteShow" style="display:none;">删除此题卡</span>
+                    <img src="/Content/Question/img/warning_icon.png" />
+                    <span class="delete-option-text" data-bind="visible:DeleteOptionShow" style="display:none;">选项个数不能为 0</span>
+                    <span class="delete-text" data-bind="visible:DeleteQuestionShow" style="display:none;">删除此题卡</span>
                 </div>
                 <div class="tip-bottom">
-                    <div class="confirm-btn tip-btn" data-bind="visible:DeleteShow,click:DeleteConfirm" style="display:none;">确定</div>
-                    <div class="cancel-btn tip-btn" data-bind="visible:DeleteShow,click:DeleteCancel" style="display:none;">取消</div>
+                    <div class="confirm-btn tip-btn" data-bind="visible:DeleteQuestionShow,click:DeleteQuestionConfirm" style="display:none;">确定</div>
                     <div class="confirm-btn confirm-option-btn tip-btn" data-bind="visible:DeleteOptionShow,click:DeleteOptionConfirm" style="display:none;">确定</div>
+                    <div class="cancel-btn tip-btn" data-bind="click:DeleteCancel">取消</div>
                 </div>
             </div>
-            <div class="score-set tip-box" data-bind="visible:ScoreShow" style="display:none;">
+            <div class="question-set-tip tip-box" data-bind="visible:QuestionSetShow" style="display:none;">
                 <div class="tip-top">
-                    <span class="tip-title">分值设置</span>
+                    <span class="tip-title">题目设置</span>
                     <div class="close-btn" data-bind="click:DeleteClose"><i class="fa fa-times" aria-hidden="true"></i></div>
                 </div>
                 <div class="tip-content">
-                	<div class="item-score">
-                		<span data-bind="visible:!OptionScoreShow()" style="display:none;">本道题目的分值为 </span>
-                		<span data-bind="visible:OptionScoreShow" style="display:none;">本道选项的分值为 </span>
-                    	<input type="text" data-bind="textInput:FormatScore" maxlength="5" class="format-score" autofocus="autofocus"/>
-                	</div>
+                    <div class="item-set" data-bind="visible:CurrentType()===2" style="display:none;">
+                        <span>题目最多可选 </span>
+                        <input type="text" name="input" data-bind="textInput:MaxNum" maxlength="5" class="format-score form-control"/>
+                        <span>项，</span>
+                        <span>最少选 </span>
+                        <input type="text" name="input" data-bind="textInput:MinNum" maxlength="5" class="format-score form-control" />
+                        <span>项。</span>
+                    </div>
+                    <div class="item-set">
+                        <span data-bind="visible:QuestionSetShow" style="display:none;">题目的分值为 </span>
+                        <input type="text" name="input" data-bind="textInput:FormatScore" maxlength="5" class="format-score form-control" />
+                    </div>
+                    <div class="item-set" data-bind="visible:QuestionSetShow" style="display:none;">
+                        <span class="question-checkbox-set">题目是否必填 </span>
+                        <input type="checkbox" name="checkbox" class="question-checkbox-set-box" />
+                    </div>
                 </div>
                 <div class="tip-bottom">
-                    <div class="confirm-btn confirm-score-btn tip-btn" data-bind="visible:!OptionScoreShow(),click:ScoreConfirm" style="display:none;">确定</div>
-                    <div class="confirm-btn confirm-option-score-btn tip-btn" data-bind="visible:OptionScoreShow,click:OptionScoreConfirm" style="display:none;">确定</div>
+                    <div class="confirm-btn confirm-score-btn tip-btn" data-bind="visible:QuestionSetShow(),click:QuestionSetConfirm" style="display:none;">确定</div>
+                    <div class="cancel-btn tip-btn" data-bind="click:DeleteCancel">取消</div>
+                </div>
+            </div>
+            <div class="option-set-box tip-box" data-bind="visible:OptionSetShow" style="display:none;">
+                <div class="tip-top">
+                    <span class="tip-title">选项设置</span>
+                    <div class="close-btn" data-bind="click:DeleteClose"><i class="fa fa-times" aria-hidden="true"></i></div>
+                </div>
+                <div class="tip-content">
+                    <div class="item-set">
+                        <span data-bind="visible:OptionSetShow" style="display:none;">选项的分值为 </span>
+                        <input type="text" name="input" data-bind="textInput:FormatScore" maxlength="5" class="format-score form-control" />
+                    </div>
+                </div>
+                <div class="tip-bottom">
+                    <div class="confirm-btn confirm-option-set-btn tip-btn" data-bind="click:OptionSetConfirm">确定</div>
+                    <div class="cancel-btn tip-btn" data-bind="click:DeleteCancel">取消</div>
+                </div>
+            </div>
+            <div class="option-batch-add tip-box" data-bind="visible:BatchAddOptionShow" style="display:none;">
+                <div class="tip-top">
+                    <span class="tip-title">批量添加选项</span>
+                    <div class="close-btn" data-bind="click:DeleteClose"><i class="fa fa-times" aria-hidden="true"></i></div>
+                </div>
+                <div class="tip-content">
+                    <div class="item-score item-score-area">
+                        <div class="batch-add-text">每行代表一个选项，可以添加多个选项</div>
+                        <textarea class="batch-add-textarea form-control" name="textarea" data-bind="textinput:BatchArea"></textarea>
+                    </div>
+                </div>
+                <div class="tip-bottom">
+                    <div class="confirm-btn confirm-batch-add-btn tip-btn" data-bind="click:BatchAddOptionConfirm">确定</div>
+                    <div class="cancel-btn tip-btn" data-bind="click:DeleteCancel">取消</div>
                 </div>
             </div>
         </div>
     </div>
-	<script src="js/communication.js"></script>
+
     <script>
-    	function getAjax(){
-    		var options={
-	    		"controller":"test.json",
-	    	}
-	    	var successFun=function(result){
-	    		console.log(result);
-	    	}
-	    	var errorFun=function(){
-	    		console.log("错误");
-	    	}
-	    	communication.get(options,successFun,errorFun);
-    	}
-    	getAjax();
-        var questionnaireId = $("#txt_QuestionnaireId").val();
+        var Lists;//题目类型
+        var Datas;//题目列表
+        var questionnaireId = $("#txt_QuestionnaireId").val();  //问卷ID
+        var oTitle = $("#txt_QuestionnaireName").val();         //问卷标题
+        var oDec = $("#txt_QuestionnareDesc").val();            //问卷描述 "欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助！";
         var requestUrl = {
-            QuestionnaireUrl: '../Question/Questionnaire',                // '/knx/Question/Questionnaire',
-            QuestionnaireViewUrl: '../Question/QuestionnaireView',        // '/knx/Question/QuestionnaireView',
-            QuestionnaireFormUrl: '../Question/QuestionnaireForm',       //'/knx/Question/QuestionnaireForm',
-            SaveQuestionUrl: '../Question/SaveQuestion',                 //'/knx/Question/SaveQuestion'
+            QuestionnaireUrl: '../Question/Questionnaire',                
+            QuestionnaireViewUrl: '../Question/QuestionnaireView',     
+            QuestionnaireFormUrl: '../Question/QuestionnaireForm',      
+            SaveQuestionUrl: '../Question/SaveQuestion',               
             QuestionsUrl: '../Question/QuestionList',
             DeleteQuestionInfoUrl: '../Question/DeleteQuestionInfo',
-            EditQustionsDescUrl: '../Question/EditQustionsDesc'
-
+            EditQustionsDescUrl: '../Question/EditQustionsDesc',
+            UpdateQuestionOrderUrl: '../Question/UpdateQuestionOrder',
+            GetQuestionTypesUrl: '../Question/GetQuestionTypes',
+            QuestionCopyUrl: '../Question/QuestionCopy',
+            UpdateTitleOrDesc:'../Question/UpdateTitleOrDesc'
         };
-
+        //问卷题目类型模板
         var TemplateDatas = {
             "1": {
                 "QuestionId": 0,
@@ -252,220 +301,192 @@
                 "QuestionOptions": ""
             }
         }
-        var Lists = [
-            {
-                "TypeId": 1,
-                "TypeName": "单选题"
-            },
-            {
-                "TypeId": 2,
-                "TypeName": "多选题"
-            },
-            {
-                "TypeId": 3,
-                "TypeName": "单行问答题"
-            },
-            {
-                "TypeId": 4,
-                "TypeName": "多行问答题"
-            },
-            {
-                "TypeId": 5,
-                "TypeName": "描述说明"
-            }
-        ]
-        
-        var Datas;
-        
-        function BindData() {
-            $.ajax({
-                url: requestUrl.QuestionsUrl,
-                async: false,
-                type: "post",
-                dataType: 'json',
-                data: { QuestionnaireId: questionnaireId },
-                success: function (result) {
-                    if (result.IsSuccess) {
-                        var strJson = [],arr;
-                        for (var i = 0; i < result.Data.length; i++) {
-                            if (result.Data[i].TypeId === 1 || result.Data[i].TypeId === 2) {
-                                arr = JSON.parse(result.Data[i].QuestionOptions);
-                                result.Data[i].QuestionOptions = arr;
-                            }
-                            strJson.push(result.Data[i]);
-                        }
-                        console.log(strJson);
-                        Datas = strJson;
-                        vm.Datas(Datas);
-                    }
-                }
-            });
+        //初始化首先执行
+        function Init() {
+            BindQuestionType();     //题目类型列表
+            BindData();             //题目列表
         }
-      	
-      	var Datas = [
-	      	{
-	          	"QuestionId": 2,
-	          	"CreateDate": "/Date(1506492931500)/",
-	          	"CreateUserId": 1,
-	          	"UpdateDate": "/Date(1508229430093)/",
-	          	"UpdateUserId": 0,
-	          	"TypeId": 1,
-	          	"QuestionnaireId": 1,
-	          	"QuestionName": "第一题信息房间开放接口减肥咖啡接口",
-	          	"DisplayOrder": 1,
-	          	"MinOption": 1,
-	          	"MaxOption": 0,
-	          	"Score": 10,
-	          	"MustFill": 1,
-	          	"DisplayMode": 4,
-	          	"QuestionOptions": [{ "OptionId": 1, "OptionContent": "选项1", "AllowWrite": 0, "OptionScore": 4, "DisplayOrder": 1 }, { "OptionId": 2, "OptionContent": "选项2", "AllowWrite": 0, "OptionScore": 3, "DisplayOrder": 2 }, { "OptionId": 3, "OptionContent": "选项3", "AllowWrite": 0, "OptionScore": 2, "DisplayOrder": 3 }, { "OptionId": 4, "OptionContent": "选项4", "AllowWrite": 0, "OptionScore": 1, "DisplayOrder": 4 }]
-	     	},
-	      	{
-	          	"QuestionId": 3,
-	          	"CreateDate": "/Date(1506492966477)/",
-	          	"CreateUserId": 1,
-	          	"UpdateDate": "/Date(1508229430100)/",
-	          	"UpdateUserId": 0,
-	          	"TypeId": 2,
-	          	"QuestionnaireId": 1,
-	          	"QuestionName": "第二题请在此输入问题标题",
-	          	"DisplayOrder": 2,
-	          	"MinOption": 1,
-	          	"MaxOption": 0,
-	          	"Score": 5,
-	          	"MustFill": 1,
-	          	"DisplayMode": 4,
-	          	"QuestionOptions": [{ "OptionId": 1, "OptionContent": "选项1", "AllowWrite": 0, "OptionScore": 2, "DisplayOrder": 1 }, { "OptionId": 2, "OptionContent": "选项2", "AllowWrite": 0, "OptionScore": 1, "DisplayOrder": 2 }, { "OptionId": 3, "OptionContent": "3333", "AllowWrite": 0, "OptionScore": 2, "DisplayOrder": 3 }, { "OptionId": 4, "OptionContent": "4444", "AllowWrite": 0, "OptionScore": 0, "DisplayOrder": 4 }, { "OptionId": 5, "OptionContent": "5555", "AllowWrite": 0, "OptionScore": 0, "DisplayOrder": 5 }, { "OptionId": 6, "OptionContent": "6666", "AllowWrite": 0, "OptionScore": 0, "DisplayOrder": 6 }]
-	      	},
-	      	{
-	          	"QuestionId": 5,
-	          	"CreateDate": "/Date(1506493023357)/",
-	          	"CreateUserId": 1,
-	          	"UpdateDate": "/Date(1508229430107)/",
-	          	"UpdateUserId": 0,
-	          	"TypeId": 1,
-	          	"QuestionnaireId": 1,
-	          	"QuestionName": "第四题请在此输入问题标题",
-	          	"DisplayOrder": 3,
-	          	"MinOption": 1,
-	          	"MaxOption": 0,
-	          	"Score": 10,
-	          	"MustFill": 1,
-	          	"DisplayMode": 4,
-	          	"QuestionOptions": [{ "OptionId": 1, "OptionContent": "aaa", "AllowWrite": 0, "OptionScore": 4, "DisplayOrder": 1 }, { "OptionId": 2, "OptionContent": "bbb", "AllowWrite": 0, "OptionScore": 3, "DisplayOrder": 2 }, { "OptionId": 3, "OptionContent": "ccc", "AllowWrite": 0, "OptionScore": 2, "DisplayOrder": 3 }, { "OptionId": 4, "OptionContent": "ddd", "AllowWrite": 0, "OptionScore": 1, "DisplayOrder": 4 }]
-	      	},
-	      	{
-	          	"QuestionId": 4,
-	          	"CreateDate": "/Date(1506492978317)/",
-	          	"CreateUserId": 1,
-	          	"UpdateDate": "/Date(1508229430113)/",
-	          	"UpdateUserId": 0,
-	          	"TypeId": 3,
-	          	"QuestionnaireId": 1,
-	          	"QuestionName": "第三题请在此输入问题标题",
-	          	"DisplayOrder": 4,
-	          	"MinOption": 4,
-	          	"MaxOption": 0,
-	          	"Score": 3,
-	          	"MustFill": 1,
-	          	"DisplayMode": 0,
-	          	"QuestionOptions": ""
-	      	},
-	      	{
-	          	"QuestionId": 6,
-	          	"CreateDate": "/Date(1506493051790)/",
-	          	"CreateUserId": 1,
-	          	"UpdateDate": "/Date(1508229430117)/",
-	          	"UpdateUserId": 0,
-	          	"TypeId": 1,
-	          	"QuestionnaireId": 1,
-	          	"QuestionName": "第5题请在此输入问题标题",
-	          	"DisplayOrder": 5,
-	          	"MinOption": 1,
-	          	"MaxOption": 0,
-	          	"Score": 3,
-	          	"MustFill": 1,
-	          	"DisplayMode": 4,
-	          	"QuestionOptions": [{ "OptionId": 1, "OptionContent": "选项1", "AllowWrite": 0, "OptionScore": 2, "DisplayOrder": 1 }, { "OptionId": 2, "OptionContent": "选项2", "AllowWrite": 0, "OptionScore": 1, "DisplayOrder": 2 }]
-	      	},
-	      	{
-	          	"QuestionId": 7,
-	          	"CreateDate": "/Date(1506493062993)/",
-	          	"CreateUserId": 1,
-	          	"UpdateDate": "/Date(1508229430130)/",
-	          	"UpdateUserId": 0,
-	          	"TypeId": 3,
-	          	"QuestionnaireId": 1,
-	          	"QuestionName": "第六题请在此输入问题标题",
-	          	"DisplayOrder": 6,
-	          	"MinOption": 4,
-	          	"MaxOption": 0,
-	          	"Score": 3,
-	          	"MustFill": 1,
-	          	"DisplayMode": 0,
-	          	"QuestionOptions": ""
-	      	},
-	      	{
-	          	"QuestionId": 8,
-	          	"CreateDate": "/Date(1506493071130)/",
-	          	"CreateUserId": 1,
-	          	"UpdateDate": "/Date(1508229430133)/",
-	         	"UpdateUserId": 0,
-	          	"TypeId": 3,
-	          	"QuestionnaireId": 1,
-	          	"QuestionName": "第七题请在此输入问题标题",
-	          	"DisplayOrder": 7,
-	          	"MinOption": 4,
-	          	"MaxOption": 0,
-	          	"Score": 4,
-	          	"MustFill": 1,
-	          	"DisplayMode": 0,
-	          	"QuestionOptions": ""
-	      	}
-	    ]
-      	
-        function Save(Question) {
-            var question = {};
-            question["QuestionId"] = Question.QuestionId;
-            question["TypeId"] = Question.TypeId;
-            question["QuestionnaireId"] = Question.QuestionnaireId;
-            question["MustFill"] = Question.MustFill;
-            question["QuestionName"] = Question.QuestionName;
-            question["DisplayOrder"] = Question.DisplayOrder;
-            question["Score"] = Number(Question.Score);
-            question["DisplayMode"] = Number(Question.DisplayMode);
-            var options = Question.QuestionOptions;
-            console.log(Question);
-            $.ajax({
-                url: requestUrl.SaveQuestionUrl,
-                async: false,
-                type: "post",
-                dataType: 'json',
-                data: { jsonStr: JSON.stringify(question), optionInfo: JSON.stringify(options), QuestionnaireId: questionnaireId },
-                success: function (result) {
-                    if (result.IsSuccess) {
-                        $("#txt_QuestionId").val(result.Data);
-                        Question.QuestioinId = result.Data;
-                        console.log(Question);
-                        Datas.push(Question);
-                        vm.Datas(Datas);
-                        vm.AddScroll();
-                        vm.ContinueAdd(true);
-                        //window.location.reload();
-                    }
-                },
-                error: function () {
-                    alert();
-                }
-            });
-        }
-        
-        var oTitle="呵呵呵";
-        var oDec="欢迎参加调查！答卷数据仅用于统计分析，请放心填写。题目选项无对错之分，按照实际情况选择即可。感谢您的帮助！";
 
+        //获取屏幕的宽度
+        function getWidth() {
+            return $(window).width();
+        }
+
+        //公共弹窗
+        function g_alert(msg) {
+            var t;
+            clearTimeout(t);
+            if ($('.g_alert').length < 1) {
+                $("body").append('<div class="g_alert">' + msg + '</div>');
+                var msg_w = $(".g_alert").width();
+                var msg_h = $(".g_alert").height();
+                $(".g_alert").css({ "margin-left": (-msg_w / 2) + 48 });
+                t = setTimeout("$('.g_alert').remove()", 1000);
+            }
+        }
+        //格式化数组
+        function getArr(arr) {
+            var arr1 = [];
+            for (var i = 0; i <arr.length; i++) {
+                if (arr[i].TypeId === 1 || arr[i].TypeId === 2) {
+                    arr[i].QuestionOptions = JSON.parse(arr[i].QuestionOptions);
+                }
+                arr1.push(arr[i]);
+            }
+        }
+        //获取题目题型
+        function BindQuestionType(){
+            var params = {
+                "controller": requestUrl.GetQuestionTypesUrl,
+            }
+            var successFun = function (result) {
+                if (result.IsSuccess) {
+                    Lists = result.Data;
+                    vm.Lists(Lists);
+                } else {
+                    g_alert("题目类型加载出错!");
+                }
+            }
+            var errorFun = function () {
+                g_alert("题目类型加载出错!");
+            }
+            communication.post(params, successFun, errorFun);
+        }
+        //获取题目列表
+        function BindData() {
+            var params = {
+                "controller": requestUrl.QuestionsUrl,
+                data: {
+                    QuestionnaireId: questionnaireId
+                }
+            }
+            var successFun = function (result) {
+                if (result.IsSuccess) {
+                    var Data = result.Data;
+                    getArr(Data);
+                    Datas = Data;
+                    vm.Datas(Datas);
+                } else {
+                    g_alert("题目加载出错!");
+                }
+            }
+            var errorFun = function () {
+                g_alert("题目加载出错!");
+            }
+            communication.post(params, successFun, errorFun);
+        }
+      
+        //保存选项
+        function OptionSave(Question,mySuccessFun) {
+            var params = {
+                "controller": requestUrl.SaveQuestionUrl,
+                data: {
+                    jsonStr: JSON.stringify(Question),
+                    optionInfo: JSON.stringify(Question.QuestionOptions),
+                    QuestionnaireId: questionnaireId
+                }
+            }
+            var successFun = mySuccessFun;
+            var errorFun = function () {
+                g_alert("保存出错!");
+            }
+            communication.post(params, successFun, errorFun);
+        }
+
+        //增加题目
+        function AddSave(Question,mySuccessFun) {
+            var params = {
+                "controller": requestUrl.SaveQuestionUrl,
+                data: {
+                    jsonStr: JSON.stringify(Question),
+                    optionInfo: JSON.stringify(Question.QuestionOptions),
+                    QuestionnaireId: questionnaireId
+                }
+            }
+            var successFun = mySuccessFun;
+            var errorFun = function () {
+                g_alert("保存出错!");
+            }
+            communication.post(params, successFun, errorFun);
+        }
+
+        //复制题目
+        function CopySave(Question, oIndex,mySuccessFun) {
+            var params = {
+                "controller": requestUrl.QuestionCopyUrl,
+                data: {
+                    QuestionInfo: JSON.stringify(Question),
+                    optionInfo: JSON.stringify(Question.QuestionOptions),
+                    QuestionnaireId: questionnaireId,
+                    CrtOder: oIndex
+                }
+            }
+            var successFun = mySuccessFun;
+            var errorFun = function () {
+                g_alert("保存出错!");
+            }
+            communication.post(params, successFun, errorFun);
+        }
+
+        //拖拽 保存
+        function UpdateDisplayOrder(QuestionId,OriginalOrder, CurrentOrder,mySuccessFun){
+            var params = {
+                "controller": requestUrl.UpdateQuestionOrderUrl,
+                data: {
+                    QuestionId: QuestionId,
+                    OriginalOrder: OriginalOrder,
+                    CurrentOrder: CurrentOrder,
+                    QuestionnaireId: questionnaireId
+                }
+            }
+            var successFun = mySuccessFun;
+            var errorFun = function () {
+                g_alert("保存出错!");
+            }
+            communication.post(params, successFun, errorFun);
+        }
+
+        //删除题目
+        function DeleteQuestionByQid(QuestionId,OIndex,mySuccessFun) {
+            var params = {
+                "controller": requestUrl.DeleteQuestionInfoUrl,
+                data: {
+                    id: QuestionId,
+                    CrtOrder: OIndex,
+                    QuestionnaireId: questionnaireId
+                }
+            }
+            var successFun = mySuccessFun;
+            var errorFun = function () {
+                g_alert("保存出错!");
+            }
+            communication.post(params, successFun, errorFun);
+        }
+         
+        // =======问卷标题和说明修改=======
+        function UpdateQuestionnaire(TitleOrDesc, IsTitle,mySuccessFun) {
+            var TitleOrDesc = TitleOrDesc;
+            var QuestionnaireId = $("#txt_QuestionnaireId").val();
+            if (QuestionnaireId == "") {
+                return;
+            }
+
+            var params = {
+                "controller":requestUrl.UpdateTitleOrDesc,
+                data: {
+                    TitleOrDesc: TitleOrDesc,
+                    IsTitle: IsTitle,
+                    QuestionnaireId: QuestionnaireId
+                }
+            }
+            var successFun = mySuccessFun;
+            var errorFun = function () {
+                g_alert("保存出错!");
+            }
+            communication.post(params, successFun, errorFun);
+        }
     </script>
     <script type="text/javascript">
-		
         var vm = {
             ItemIndex: ko.observable(-1),
             OptionIndex: ko.observable(-1),
@@ -475,245 +496,390 @@
             ContinueAdd: ko.observable(true),
             DialogShow: ko.observable(false),
             DeleteShow: ko.observable(false),
+            DeleteQuestionShow:ko.observable(false),
             DeleteOptionShow: ko.observable(false),
+            QuestionSetShow: ko.observable(false),
+            OptionSetShow:ko.observable(false),
             FormatScore:ko.observable(0),
-            ScoreShow:ko.observable(false),
             CurrentItem:ko.observable(),
             OptionScoreShow:ko.observable(false),
-            CurrentOption:ko.observable(),
+            CurrentOption: ko.observable(),
+            CurrentType:ko.observable(0),
             Title: ko.observable(oTitle),
             Dec: ko.observable(oDec),
+            MinNum: ko.observable(0),
+            MaxNum: ko.observable(0),
+            CurrentOptionLen: ko.observable(0),
+            BatchAddOptionShow: ko.observable(false),
+            BatchArea: ko.observable(),
+            BatchType:ko.observable(),
             Lists: ko.observableArray(Lists),
             Datas: ko.observableArray(Datas),
             AddItem: function (event, type, data) {
                 if (vm.ContinueAdd()) {
                     vm.ContinueAdd(false);
-                    var oTemplate = TemplateDatas[type];
-                    
+                    //深拷贝
+                    var TemplateDatas2 = $.extend(true, [], TemplateDatas);
+                    var oTemplate = TemplateDatas2[type];
+
+                    oTemplate.DisplayOrder = Datas.length + 1;
+
+                    var mySuccessFun = function (result) {
+                        if (result.IsSuccess) {
+                            $("#txt_QuestionId").val(result.Data);
+                            oTemplate.QuestionId = result.Data;
+                            var Datas2 = $.extend(true, [], Datas);
+                            Datas2.push(oTemplate);
+                            for (var j = 0; j < Datas2.length; j++) {
+                                Datas2[j].DisplayOrder = j + 1;
+                            }
+                            Datas = Datas2;
+                            vm.Datas(Datas);
+                            vm.AddScroll();
+                            vm.ContinueAdd(true);
+                            g_alert("保存成功");
+                        } else {
+                            g_alert("保存出错!");
+                        }
+                    }
+
                     //ajax请求
-//                  Save(oTemplate);	//oTemplate:添加的题目对象
-					
-					//正式环境中注释掉
-					Datas.push(oTemplate);
-                    vm.Datas(Datas);
-                    vm.AddScroll();
-                    vm.ContinueAdd(true);
+                    AddSave(oTemplate,mySuccessFun);	//oTemplate:添加的题目对象
                 }
             },
             Copy: function (event, index, data) {
                 if (vm.ContinueCopy()) {
                     vm.ContinueCopy(false);
                     var oItem = Datas[index];
+                    var oIndex = Datas[index].DisplayOrder;
 
-                    //深拷贝
-                    var Datas2 = $.extend(true, [], Datas);
-                    Datas2.splice(index, 0, oItem);
-                    Datas = Datas2;
-                    vm.Datas(Datas);
-                    vm.ContinueCopy(true);
-                    
-	                //ajax请求
-	//              Save(oItem,index);		//oItem:被复制的题目对象，index:被复制的题目的位置
+                    oItem.QuestionId = 0;
+                    oItem.DisplayOrder = oIndex + 1;
+
+                    var mySuccessFun = function (result) {
+                        if (result.IsSuccess) {
+                            oItem.QuestionId = result.Data;
+                            var Datas2 = $.extend(true, [], Datas);
+                            Datas2.splice(oIndex, 0, oItem);
+                            for (var j = 0; j < Datas2.length; j++) {
+                                Datas2[j].DisplayOrder = j + 1;
+                            }
+
+                            Datas = Datas2;
+                            vm.Datas(Datas);
+                            vm.ContinueCopy(true);
+                            UpdateDisplayOrder();
+                            g_alert("保存成功");
+                        } else {
+                            g_alert("保存出错!");
+                        }
+                    }
+
+                    //ajax请求
+                    CopySave(oItem, oIndex, mySuccessFun);    //oItem:被复制的题目对象，把对象中的quesiotninId赋为0；index:被复制的题目的位置  //返回新增的对象的QuestionId;
                 }
             },
             Delete: function (event, index, data) {
                 vm.DeleteIndex(index);
                 vm.DialogShow(true);
                 vm.DeleteShow(true);
-                vm.ScoreShow(false);
-            	vm.OptionScoreShow(false);
-            },
-            DeleteConfirm: function () {
-            	var oIndex=vm.DeleteIndex();
-                Datas.splice(oIndex, 1);
-                for(var i=0;i<Datas.length;i++){
-                	Datas[i].DisplayOrder=i;
-                }
-                console.log(Datas);
-                vm.Datas(Datas);
-                vm.DeleteShow(false);
-                vm.DialogShow(false);
-                vm.ScoreShow(false);
-            	vm.OptionScoreShow(false);
-                
-                //ajax请求
-//              Save(oIndex);		//oIndex:删除的位置
+                vm.DeleteOptionShow(false);
+                vm.DeleteQuestionShow(true);
             },
             DeleteCancel: function () {
+                vm.HideDialog();
+            },
+            DeleteClose: function () {
+                vm.HideDialog();
+            },
+            DeleteQuestionConfirm: function () {
+                var oIndex = vm.DeleteIndex();
+                var QuestionId = Datas[oIndex].QuestionId;
+                var oOrder = Datas[oIndex].DisplayOrder;
+                
+                var mySuccessFun = function (result) {
+                    if (result.IsSuccess) {
+                        Datas.splice(oIndex, 1);
+                        for (var i = 0; i < Datas.length; i++) {
+                            Datas[i].DisplayOrder = i + 1;
+                        }
+                        vm.Datas(Datas);
+                        vm.DeleteShow(false);
+                        vm.DialogShow(false);
+                        vm.DeleteQuestionShow(false);
+                        vm.DeleteOptionShow(false);
+                        g_alert("保存成功");
+                    } else {
+                        g_alert("保存出错!");
+                    }
+                }
+
+                //ajax请求    //删除题目的QuestionId：questionId,删除的当前位置：oIndex
+                DeleteQuestionByQid(QuestionId, oIndex, mySuccessFun);
+            },
+            DeleteOption:function(event,index,data){
+                var oItemIndex = Number($(event.target).parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index"));
+
+                if (Datas[oItemIndex].QuestionOptions.length <= 1) {
+                    vm.DialogShow(true);
+                    vm.DeleteShow(true);
+                    vm.DeleteOptionShow(true);
+                } else {
+
+                    //深拷贝
+                    var Datas2 = $.extend(true, [], Datas);
+                    Datas2[oItemIndex].QuestionOptions.splice(index, 1);
+                    for (var i = 0; i < Datas2[oItemIndex].QuestionOptions.length; i++) {
+                        var oContent = Datas2[oItemIndex].QuestionOptions[i].OptionContent;
+                        Datas2[oItemIndex].QuestionOptions[i].OptionId = i;
+                        Datas2[oItemIndex].QuestionOptions[i].DisplayOrder = i + 1;
+                        if (oContent === ('选项' + (i + 1)) || oContent === ('选项' + (i + 2))) {
+                            Datas2[oItemIndex].QuestionOptions[i].OptionContent = '选项' + (i + 1);
+                        }
+                    }
+                    Datas = Datas2;
+
+                    var mySuccessFun = function (result) {
+                        if (result.IsSuccess) {
+                            vm.Datas(Datas);
+                            g_alert("保存成功");
+                        } else {
+                            g_alert("保存出错!");
+                        }
+                    }
+                    //ajax请求
+                    OptionSave(Datas[oItemIndex], mySuccessFun);
+                }
+            },
+            DeleteOptionConfirm: function () {
+                vm.DeleteOptionShow(false);
                 vm.DeleteShow(false);
                 vm.DialogShow(false);
             },
-            DeleteClose: function () {
-                if (vm.DeleteOptionShow()) {
-                    $(".delete-tip").hide();
-                    vm.DeleteOptionShow(false);
-                }
-                if (vm.DeleteShow()) {
-                    vm.DeleteShow(false);
-                }
-                vm.DialogShow(false);
-            },
-            DeleteOptionConfirm: function () {
-                $(".delete-tip").hide();
-                vm.DeleteOptionShow(false);
-                vm.DialogShow(false);
-            },
-            ScoreSet:function(event, index, data){
-            	console.log(data);
-            	console.log(index);
+            QuestionSet: function (event, index, data) {
+                vm.CurrentType(data.TypeId);
             	vm.CurrentItem(index);
             	vm.FormatScore(data.Score);
-            	vm.DialogShow(true);
-            	vm.ScoreShow(true);
-            	vm.OptionScoreShow(false);
-            },
-            ScoreConfirm:function(){
-            	var oScore=vm.FormatScore();
-            	var oItemIndex=vm.CurrentItem();
-            	
-            	Datas[oItemIndex].Score=oScore;
-            	console.log(Datas);
-            	vm.Datas(Datas);
-            	
-            	//ajax请求
-//              Save(Datas[oItemIndex]);	//Datas[oItemIndex]:设置分值的题目对象
-            	vm.DialogShow(false);
-            	vm.ScoreShow(false);
-            	vm.OptionScoreShow(false);
-            },
-            OptionScoreSet:function(event, index, data){
-            	var oItemIndex = $(event.target).parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index");
-            	console.log(Number(oItemIndex));
-            	console.log(data.OptionScore);
-            	console.log(index);
-            	vm.CurrentItem(Number(oItemIndex));
-            	vm.CurrentOption(index);
-            	vm.FormatScore(data.OptionScore);
-            	vm.DialogShow(true);
-            	vm.ScoreShow(true);
-            	vm.OptionScoreShow(true);
-            },
-            OptionScoreConfirm:function(){
-            	var oScore=vm.FormatScore();
-            	var oItemIndex=vm.CurrentItem();
-            	var oIndex=vm.CurrentOption();
-            	
-            	Datas[oItemIndex].QuestionOptions[oIndex].OptionScore=oScore;
-            	console.log(Datas);
-            	vm.Datas(Datas);
-            	
-            	//ajax请求
-//              Save(Datas[oItemIndex]);	//Datas[oItemIndex]:设置分值的题目对象
-            	vm.DialogShow(false);
-            	vm.ScoreShow(false);
-            	vm.OptionScoreShow(false);
-            },
-            CheckboxEnable:function(event, index, data){
-            	var oItemIndex = $(event.target).parent(".option-type-checkbox").parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index");
-            	vm.CurrentItem(Number(oItemIndex));
-            	vm.CurrentOption(index);
-            	console.log(oItemIndex);
-            	Datas[oItemIndex].QuestionOptions[index].AllowWrite=1;
-            	
-            	console.log(Datas);
-            	vm.Datas(Datas);
-            	
-            	//ajax请求
-//              Save(Datas[oItemIndex]);	//Datas[oItemIndex]:设置分值的题目对象
-            	$(event.target).hide();
-            	$(event.target).next().show();
-            	$(event.target).parent(".option-type-checkbox").parent(".option-select").parent(".question-choice-option").find(".option-select-checkbox-box").show();
-            	
-            },
-            CheckboxDisable:function(event, index, data){
-            	var oItemIndex = $(event.target).parent(".option-type-checkbox").parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index");
-            	vm.CurrentItem(Number(oItemIndex));
-            	vm.CurrentOption(index);
-            	console.log(oItemIndex);
-            	Datas[oItemIndex].QuestionOptions[index].AllowWrite=0;
-            	
-            	//ajax请求
-//              Save(Datas[oItemIndex]);	//Datas[oItemIndex]:设置分值的题目对象
-            	
-            	console.log(Datas);
-            	vm.Datas(Datas);
-            	$(event.target).hide();
-            	$(event.target).prev().show();
-            	$(event.target).parent(".option-type-checkbox").parent(".option-select").parent(".question-choice-option").find(".option-select-checkbox-box").hide();
-            },
-            Up:function(event, index, data){
-            	var oItemIndex = $(event.target).parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index");
-            	var oUpIndex;
-            	var oItem=Datas[Number(oItemIndex)];
-            	var oItemOption=Datas[Number(oItemIndex)].QuestionOptions[index];
-            	var oIndexContent=oItemOption.OptionContent;
-            	var oUpContent='';
-            	if(index!==0){
-            		oUpIndex=index-1;
-            		oUpContent=Datas[Number(oItemIndex)].QuestionOptions[oUpIndex].OptionContent;
-            		//深拷贝
-	                var Datas2 = $.extend(true, [], Datas);
-	                Datas2[Number(oItemIndex)].QuestionOptions.splice(index, 1);
-	                Datas2[Number(oItemIndex)].QuestionOptions.splice(oUpIndex, 0, oItemOption);
-	                if(oIndexContent===("选项"+(index+1))){
-	                	Datas2[Number(oItemIndex)].QuestionOptions[oUpIndex].OptionContent="选项"+(oUpIndex+1);
-	                }
-	                if(oUpContent===("选项"+(oUpIndex+1))){
-	                	console.log(oUpContent);
-	                	Datas2[Number(oItemIndex)].QuestionOptions[index].OptionContent="选项"+(index+1);
-	                }
-	                for(var j=0;j<Datas2[Number(oItemIndex)].QuestionOptions.length;j++){
-	                	Datas2[Number(oItemIndex)].QuestionOptions[j].DisplayOrder=j;
-	                	Datas2[Number(oItemIndex)].QuestionOptions[j].OptionId=j;
-	                	if(Datas2[Number(oItemIndex)].QuestionOptions[j].OptionContent==""){
-	                		Datas2[Number(oItemIndex)].QuestionOptions[j].OptionContent="选项"+(j+1);
-	                	}
-	                }
-	                Datas = Datas2;
-	                console.log(Datas);
-                    vm.Datas([]);
-                    vm.Datas(Datas);
-                    
-                    //ajax请求
-//              	Save(oItem,index,oUpIndex);		//oItem:移动的题目，oId:开始的位置,oIndex:最后放置的位置
+
+            	if (data.TypeId === 2) {
+            	    vm.CurrentOptionLen(Datas[index].QuestionOptions.length);
+            	    vm.MaxNum(data.MaxOption);
+            	    vm.MinNum(data.MinOption);
             	}
             	
+            	if (data.MustFill === 1) {
+            	    $(".question-checkbox-set-box").prop("checked", true);
+            	} else {
+            	    $(".question-checkbox-set-box").prop("checked", false);
+            	}
+            	vm.DialogShow(true);
+            	vm.QuestionSetShow(true);
             },
-            Down:function(event, index, data){
-            	var oItemIndex = $(event.target).parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index");
-            	var oDownIndex;
-            	var oItem=Datas[Number(oItemIndex)];
-            	var oItemOption=Datas[Number(oItemIndex)].QuestionOptions[index];
-				var oIndexContent=oItemOption.OptionContent;
-            	var oDownContent='';
-            	if(index!==(oItem.QuestionOptions.length-1)){
-            		oDownIndex=index+1;
-            		oDownContent=Datas[Number(oItemIndex)].QuestionOptions[oDownIndex].OptionContent;
-            		//深拷贝
-	                var Datas2 = $.extend(true, [], Datas);
-	                Datas2[Number(oItemIndex)].QuestionOptions.splice(index, 1);
-	                Datas2[Number(oItemIndex)].QuestionOptions.splice(oDownIndex, 0, oItemOption);
-	                if(oIndexContent===("选项"+(index+1))){
-	                	Datas2[Number(oItemIndex)].QuestionOptions[oDownIndex].OptionContent="选项"+(oDownIndex+1);
-	                }
-	                if(oDownContent===("选项"+(oDownIndex+1))){
-	                	Datas2[Number(oItemIndex)].QuestionOptions[index].OptionContent="选项"+(index+1);
-	                }
-	                for(var j=0;j<Datas2[Number(oItemIndex)].QuestionOptions.length;j++){
-	                	Datas2[Number(oItemIndex)].QuestionOptions[j].DisplayOrder=j;
-	                	Datas2[Number(oItemIndex)].QuestionOptions[j].OptionId=j;
-	                	if(Datas2[Number(oItemIndex)].QuestionOptions[j].OptionContent==""){
-	                		Datas2[Number(oItemIndex)].QuestionOptions[j].OptionContent="选项"+(j+1);
-	                	}
-	                }
-	                Datas = Datas2;
-	                console.log(Datas);
-                    vm.Datas([]);
-                    vm.Datas(Datas);
+            QuestionSetConfirm:function(){
+            	var oScore=vm.FormatScore();
+            	var oItemIndex = vm.CurrentItem();
+            	var oKey = $(".question-checkbox-set-box").prop("checked");
+
+                //深拷贝
+            	var Datas2 = $.extend(true, [], Datas);
+            	Datas2[oItemIndex].MustFill = Number(oKey);
+            	Datas2[oItemIndex].Score = oScore;
+            	if (vm.CurrentType() === 2) {
+            	    Datas2[oItemIndex].MinOption = vm.MinNum();
+            	    Datas2[oItemIndex].MaxOption = vm.MaxNum();
+            	}
+            	Datas = Datas2;
+
+            	var mySuccessFun = function (result) {
+            	    if (result.IsSuccess) {
+            	        vm.Datas(Datas);
+            	        vm.DialogShow(false);
+            	        vm.QuestionSetShow(false);
+            	        g_alert("保存成功");
+            	    } else {
+            	        g_alert("保存出错!");
+            	    }
+            	}
+                //ajax请求
+            	OptionSave(Datas[oItemIndex], mySuccessFun);
+            },
+            OptionSet: function (event, index, data) {
+                var oItemIndex = $(event.target).parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index");
+                vm.CurrentItem(Number(oItemIndex));
+                vm.CurrentOption(index);
+                vm.FormatScore(data.OptionScore);
+                vm.DialogShow(true);
+                vm.OptionSetShow(true);
+            },
+            OptionSetConfirm: function () {
+                var oScore = vm.FormatScore();
+                var oItemIndex = vm.CurrentItem();
+                var oIndex = vm.CurrentOption();
+
+                Datas[oItemIndex].QuestionOptions[oIndex].OptionScore = oScore;
+
+                var mySuccessFun = function (result) {
+                    if (result.IsSuccess) {
+                        vm.Datas([]);
+                        vm.Datas(Datas);
+                        vm.DialogShow(false);
+                        vm.OptionSetShow(false);
+                        g_alert("保存成功");
+                    } else {
+                        g_alert("保存出错!");
+                    }
+                }
+                //ajax请求
+                OptionSave(Datas[oItemIndex], mySuccessFun);
+            },
+            AddOption:function(event,index,data){
+                var oItemIndex = index;
+                var oLen = Datas[oItemIndex].QuestionOptions.length;
+                var oType = $(event.target).attr("type");
+                var oTemplateOption = {
+                    "OptionId": oLen + 1,
+                    "OptionContent": "选项" + (oLen + 1),
+                    "OptionScore": 0,
+                    "DisplayOrder": oLen + 1,
+                    "AllowWrite": 0
+                }
+
+                //深拷贝
+                var Datas2 = $.extend(true, [], Datas);
+                Datas2[oItemIndex].QuestionOptions.push(oTemplateOption);
+                Datas = Datas2;
+
+                var mySuccessFun = function (result) {
+                    if (result.IsSuccess) {
+                        vm.Datas(Datas);
+                        g_alert("保存成功");
+                    } else {
+                        g_alert("保存出错!");
+                    }
+                }
+                //ajax请求
+                OptionSave(Datas[oItemIndex], mySuccessFun);
+            },
+            BatchAddOption:function(event,index,data){
+                vm.CurrentItem(index);
+                vm.DialogShow(true);
+                vm.BatchAddOptionShow(true);
+            },
+            BatchAddOptionConfirm: function () {
+                var oItemIndex = vm.CurrentItem();
+                var oLen=Datas[oItemIndex].QuestionOptions.length;
+                var oType = Datas[oItemIndex].TypeId;
+                //深拷贝
+                var TemplateDatas2 = $.extend(true, [], TemplateDatas);
+                var oTemplate = TemplateDatas2[oType];
+                var oArea=vm.BatchArea();
+                var arr = oArea.split("\n");
+                //深拷贝
+                var Datas2 = $.extend(true, [], Datas);
+                for (var i = 0; i < arr.length; i++) {
+                    var obj = new Object();
+                    obj.OptionId = oLen + i + 1;
                     
-                    //ajax请求
-//              	Save(oItem,index,oDownIndex);		//oItem:移动的题目，oId:开始的位置,oIndex:最后放置的位置
-				}
+                    obj.AllowWrite = 0;
+                    obj.OptionScore = 0;
+                    obj.DisplayOrder = oLen + i + 1;
+                    if (arr[i] == '') {
+                        obj.OptionContent = '选项' + (oLen + i + 1);
+                    } else {
+                        obj.OptionContent = arr[i];
+                    }
+                    Datas2[oItemIndex].QuestionOptions.push(obj);
+                }
+                Datas=Datas2;
+
+                var mySuccessFun = function (result) {
+                    if (result.IsSuccess) {
+                        vm.Datas(Datas);
+                        vm.DialogShow(false);
+                        vm.BatchAddOptionShow(false);
+                        g_alert("保存成功");
+                    } else {
+                        g_alert("保存出错!");
+                    }
+                }
+                //ajax请求
+                OptionSave(Datas[oItemIndex], mySuccessFun);
+            },
+            CheckboxShow: function (event, index, data) {
+                var oAllow = data.AllowWrite;
+                var oItemIndex = Number($(event.target).parent(".option-type-checkbox").parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index"));
+            	vm.CurrentItem(oItemIndex);
+            	vm.CurrentOption(index);
+            	if (oAllow === 0) {
+            	    Datas[oItemIndex].QuestionOptions[index].AllowWrite = 1;
+            	} else {
+            	    Datas[oItemIndex].QuestionOptions[index].AllowWrite = 0;
+            	}
+            	var mySuccessFun = function (result) {
+            	    if (result.IsSuccess) {
+            	        vm.Datas([]);
+            	        vm.Datas(Datas);
+            	        g_alert("保存成功");
+            	    } else {
+            	        g_alert("保存出错!");
+            	    }
+            	}
+                //ajax请求
+            	OptionSave(Datas[oItemIndex], mySuccessFun);
+            },
+            Move: function (event, index, data) {
+                var oItemIndex = Number($(event.target).parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index"));
+                var oType = $(event.target).attr("type");
+                var oItem = Datas[oItemIndex];
+                var oItemOption = Datas[oItemIndex].QuestionOptions[index];
+                var oIndexContent = oItemOption.OptionContent;
+                var oContent = '',oIndex;
+
+                if (oType === "up") {
+                    if (index === 0) {
+                        return;
+                    }else{
+                        oIndex = index - 1;
+                    }
+                }
+                if (oType === "down") {
+                    if (index === (oItem.QuestionOptions.length - 1)) {
+                        return;
+                    }else{
+                        oIndex = index + 1;
+                    }
+                }
+
+                oContent = Datas[oItemIndex].QuestionOptions[oIndex].OptionContent;
+                //深拷贝
+                var Datas2 = $.extend(true, [], Datas);
+                Datas2[oItemIndex].QuestionOptions.splice(index, 1);
+                Datas2[oItemIndex].QuestionOptions.splice(oIndex, 0, oItemOption);
+                if (oContent === ("选项" + (index + 1))) {
+                    Datas2[oItemIndex].QuestionOptions[oIndex].OptionContent = "选项" + (oIndex + 1);
+                }
+                if (oContent === ("选项" + (oIndex + 1))) {
+                    Datas2[oItemIndex].QuestionOptions[index].OptionContent = "选项" + (index + 1);
+                }
+                for (var j = 0; j < Datas2[oItemIndex].QuestionOptions.length; j++) {
+                    Datas2[oItemIndex].QuestionOptions[j].DisplayOrder = j + 1;
+                    Datas2[oItemIndex].QuestionOptions[j].OptionId = j;
+                    if (Datas2[oItemIndex].QuestionOptions[j].OptionContent == "") {
+                        Datas2[oItemIndex].QuestionOptions[j].OptionContent = "选项" + (j + 1);
+                    }
+                }
+                Datas = Datas2;
+
+                var mySuccessFun = function (result) {
+                    if (result.IsSuccess) {
+                        vm.Datas(Datas);
+                        g_alert("保存成功");
+                    } else {
+                        g_alert("保存出错!");
+                    }
+                }
+                //ajax请求
+                OptionSave(Datas[oItemIndex], mySuccessFun);
             },
             Num: function (index) {
                 var num = 0;
@@ -731,6 +897,23 @@
             AddScroll: function () {
                 var oHeight = $(".content-right").height() - 320;
                 $(document).scrollTop(oHeight);
+            },
+            HideDialog:function(){
+                vm.DeleteShow(false);
+                vm.DeleteOptionShow(false);
+                vm.DeleteQuestionShow(false);
+                vm.QuestionSetShow(false);
+                vm.OptionSetShow(false);
+                vm.BatchAddOptionShow(false);
+
+                vm.DialogShow(false);
+            },
+            SurveyView: function () {
+                if (vm.Title() == "") {
+                    g_alert("问卷标题不能为空");
+                    return;
+                }
+                window.location.href = "../Question/QuestionView?QuestionnaireId=" + questionnaireId;
             }
         }
         vm.EmptyTitle = ko.pureComputed(function () {
@@ -740,70 +923,91 @@
                 return true;
             }
         }, vm)
-		
 		vm.FormatScore.subscribe(function(newValue){
 			if(isNaN(parseInt(newValue))){
 				this.FormatScore(0);
 			}else{
 				this.FormatScore(parseInt(newValue));
 			}
-		},vm)
-		
+		}, vm)
+		vm.MinNum.subscribe(function (newValue) {
+		    if (isNaN(parseInt(newValue))) {
+		        this.MinNum(0);
+		    } else {
+		        if (this.MaxNum() > parseInt(newValue)) {
+		            this.MinNum(parseInt(newValue));
+		        }else{
+		            this.MinNum(this.MaxNum());
+		        }
+		    }
+		}, vm)
+		vm.MaxNum.subscribe(function (newValue) {
+		    if (isNaN(parseInt(newValue))) {
+		        this.MaxNum(0);
+		    } else {
+		        if (this.CurrentOptionLen() > parseInt(newValue)) {
+		            this.MaxNum(parseInt(newValue));
+		        } else {
+		            this.MaxNum(this.CurrentOptionLen());
+		        }
+		    }
+		}, vm)
+
         ko.applyBindings(vm);
-
+        
         $(document).ready(function () {
-			
-			//正式环境中打开注释
-//          BindData();
-            //表格排序
-            $(function () {
+            //页面加载完首先执行
+            Ready();
 
-                var arr = '';
-                var sort = $("#sortable").sortable({
-                    handle: ".drag",
-                    opacity: 0,
-                    delay: 10,
-                    scroll: true,
-                    cursor: '.drag',
-                    stop: function (event, ui) {	//当排序动作结束时触发此事件。
-                        var oIndex;		//题目最后放置的位置index
-                        var oItem;		//题目的数组元素对象
-                        var oId = Number(ui.item.attr("id"));		//题目的初始位置index;
-                        //记录sort后的id顺序数组
-                        var arr = $("#sortable").sortable('toArray');
-                        console.log(arr);
-                        for (var i = 0; i < arr.length; i++) {
-                            if (Number(arr[i]) === oId) {
-                                if (i !== oId) {
-                                    oIndex = i;
-                                    oItem = Datas[oId];
-                                    console.log(oId);
-                                    console.log(oIndex);
-                                    //深拷贝
-					                var Datas2 = $.extend(true, [], Datas);
-					                Datas2.splice(oId, 1);
-					                Datas2.splice(oIndex, 0, oItem);
-					                for(var j=0;j<Datas2.length;j++){
-					                	Datas2[j].DisplayOrder=j;
-					                }
-					                Datas = Datas2;
-					                console.log(Datas);
-                                    vm.Datas([]);
-                                    vm.Datas(Datas);
-                                    
-                                    //ajax请求
-//              					Save(oItem,oId,oIndex);		//oItem:移动的题目，oId:开始的位置,oIndex:最后放置的位置
-                                    break;
+            function Ready() {
+                Init();
+                //拖拽排序
+                $(function () {
+                    var sort = $("#sortable").sortable({
+                        handle: ".drag",
+                        opacity: 0,
+                        delay: 10,
+                        scroll: true,
+                        cursor: '.drag',
+                        stop: function (event, ui) {	//当排序动作结束时触发此事件。
+                            var oIndex;		//题目最后放置的位置index
+                            var oItem;		//题目的数组元素对象
+                            var oId = Number(ui.item.attr("id"));		//题目的初始位置index;
+                            //记录sort后的id顺序数组
+                            var arr = $("#sortable").sortable('toArray');
+                            for (var i = 0; i < arr.length; i++) {
+                                if (Number(arr[i]) === oId) {
+                                    if (i !== oId) {
+                                        oIndex = i;
+                                        oItem = Datas[oId];
+                                        //深拷贝
+
+                                        var mySuccessFun = function (result) {
+                                            if (result.IsSuccess) {
+                                                var Datas2 = $.extend(true, [], Datas);
+                                                Datas2.splice(oId, 1);
+                                                Datas2.splice(oIndex, 0, oItem);
+                                                for (var j = 0; j < Datas2.length; j++) {
+                                                    Datas2[j].DisplayOrder = j + 1;
+                                                }
+                                                Datas = Datas2;
+                                                vm.Datas([]);
+                                                vm.Datas(Datas);
+                                                g_alert("保存成功");
+                                            } else {
+                                                g_alert("保存出错!");
+                                            }
+                                        }
+                                        //ajax请求        //当前拖到的QuestionId:题目的Id,原始位置：oId，oIndex:最后放置的位置
+                                        UpdateDisplayOrder(oItem.QuestionId, oId + 1, oIndex + 1, mySuccessFun);
+
+                                        break;
+                                    }
                                 }
                             }
                         }
-                    }
-                });
-            }())
-
-            //获取屏幕的宽度
-            function getWidth() {
-                return $(window).width();
+                    });
+                }())
             }
 
             window.onscroll = function () {
@@ -913,156 +1117,90 @@
                 	vm.ItemIndex(-1);
                 }
             })
-
+            //题目选项
             $("body").on("blur", ".question-text", function () {
-                var oIndex = $(this).attr("index");
-                var oItemIndex = $(this).parent(".question-choice-option").parent(".question-options").attr("index");
+                var oIndex =  Number($(this).attr("index"));
+                var oItemIndex =Number($(this).parent(".question-choice-option").parent(".question-options").attr("index"));
                 if ($(this).text() === "") {
-                    $(this).text('选项' + (Number(oIndex) + 1));
+                    $(this).text('选项' + (oIndex + 1));
                 }
-                console.log($(this).text());
-                var QuestionItem=Datas[Number(oItemIndex)];
-                
-                //判断重复项
-//				var oRepeat=false;
-//              var ary=[];
-//              for(var j=0;j<QuestionItem.QuestionOptions.length;j++){
-//              	ary.push(QuestionItem.QuestionOptions[j].OptionContent);
-//              }
-//              
-//              var s = ary.join(",")+",";
-//				for(var i=0;i<ary.length;i++) {
-//					if(s.replace(ary[i]+",","").indexOf(ary[i]+",")>-1) {
-//						oRepeat=true;
-//						console.log("数组中有重复元素：" + ary[i]);
-//						break;
-//					}
-//				}
-//              if(!oRepeat){
-//              	
-//              }
-                console.log(QuestionItem);
 
-                
+                var mySuccessFun = function (result) {
+                    if (result.IsSuccess) {
+                        vm.Datas(Datas);
+                        g_alert("保存成功");
+                    } else {
+                        g_alert("保存出错!");
+                    }
+                }
                 //ajax请求
-//             	Save(QuestionItem);		//QuestionItem:失去焦点的题目对象
+                OptionSave(Datas[oItemIndex], mySuccessFun);
             })
-            
+
+            //问卷标题
             $("body").on("blur", ".question-title", function () {
-                var oTitleText= vm.Title();
-               	if(oTitleText!==oTitle){
-               		//ajax请求
-//             		Save(oTitleText);		//QuestionItem:失去焦点的题目对象
-               	}
-            })
+                var oTitleText = vm.Title();
+                if (oTitleText !== oTitle) {
 
-			$("body").on("blur", ".question-dec", function () {
-                var oDecText= vm.Dec();
-               	if(oDecText!==oDec){
-               		//ajax请求
-//             		Save(oDecText);		//QuestionItem:失去焦点的题目对象
-               	}
-            })
+                    var mySuccessFun = function (result) {
+                        if (result.IsSuccess) {
+                            g_alert("保存成功");
+                        } else {
+                            g_alert("保存出错!");
+                        }
+                    }
+                    //ajax请求
+                    UpdateQuestionnaire(oTitleText, true, mySuccessFun);
+                }
+            });
 
+            //问卷描述
+            $("body").on("blur", ".question-dec", function () {
+                var oText = $(this).text();
+                var oDecText = oDec;
+                if (oDecText !== oText) {
+                    var mySuccessFun = function (result) {
+                        if (result.IsSuccess) {
+                            g_alert("保存成功");
+                        } else {
+                            g_alert("保存出错!");
+                        }
+                    }
+                    //ajax请求	
+                    UpdateQuestionnaire(oText, false, mySuccessFun);
+                }
+            });
+            //题目标题
 			$("body").on("blur", ".question-title-text", function () {
                 var oQuestionTitle= $(this).text();
-                var oIndex=$(this).attr("index");
-				console.log(Datas[Number(oIndex)]);
-               	if(oQuestionTitle!==Datas[Number(oIndex)].QuestionName){
-               		Datas[Number(oIndex)].QuestionName=oQuestionTitle;
-               		vm.Datas(Datas);
-               		//ajax请求
-//             		Save(Datas[Number(oIndex)]);		//Datas[Number(oIndex)]:失去焦点的题目对象
-               	}
-            })
+                var oIndex = Number($(this).attr("index"));
 
-            $("body").on("click", ".option-type-delete", function (event) {
-                var oIndex = $(this).attr("index");
-                var oItemIndex = $(this).parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index");
-                var oParent = $(this).parent(".option-select");
-                var oInput = $(this).parent(".option-select").prev();
+                if (oQuestionTitle !== Datas[oIndex].QuestionName) {
 
-                if (Datas[Number(oItemIndex)].QuestionOptions.length <= 1) {
-                    vm.DialogShow(true);
-                    vm.DeleteOptionShow(true);
-                    $(".delete-tip").show();
-                } else {
-                	
-                	//深拷贝
-	                var Datas2 = $.extend(true, [], Datas);
-                    Datas2[Number(oItemIndex)].QuestionOptions.splice(Number(oIndex), 1);
-                    for(var i=0;i< Datas2[Number(oItemIndex)].QuestionOptions.length;i++){
-                    	var oContent=Datas2[Number(oItemIndex)].QuestionOptions[i].OptionContent;
-                    	Datas2[Number(oItemIndex)].QuestionOptions[i].OptionId=i;
-                    	Datas2[Number(oItemIndex)].QuestionOptions[i].DisplayOrder=i;
-                    	if(oContent===('选项'+(i+1))||oContent===('选项'+(i+2))){
-                    		Datas2[Number(oItemIndex)].QuestionOptions[i].OptionContent='选项'+(i+1);
-                    	}
-                    }
+                    var Datas2 = $.extend(true, [], Datas);
+                    Datas2[oIndex].QuestionName = oQuestionTitle;
+
                     Datas = Datas2;
-                    console.log(Datas);
-                    vm.Datas(Datas);
-                    
-                    var QuestionItem=Datas[Number(oItemIndex)];
-	                console.log(QuestionItem);
-	                //ajax请求
-	//              Save(QuestionItem);		//QuestionItem:删除选项的题目对象
+                    var mySuccessFun = function (result) {
+                        if (result.IsSuccess) {
+                            vm.Datas(Datas);
+                            g_alert("保存成功");
+                        } else {
+                            g_alert("保存出错!");
+                        }
+                    }
+                    //ajax请求
+                    OptionSave(Datas[oIndex], mySuccessFun);
                 }
-            })
-
-            $("body").on("click", ".add-choice", function () {
-                var oItemIndex = $(this).attr("index");
-                var oLen = Datas[Number(oItemIndex)].QuestionOptions.length;
-                var oType = $(this).attr("type");
-                var oTemplateOption = {
-                    "OptionId": oLen + 1,
-                    "OptionContent": "选项" + (oLen + 1),
-                    "OptionScore": 0,
-                    "DisplayOrder": oLen + 1,
-                    "AllowWrite": 0
-                }
-
-                //深拷贝
-                var Datas2 = $.extend(true, [], Datas);
-                Datas2[Number(oItemIndex)].QuestionOptions.push(oTemplateOption);
-                Datas = Datas2;
-                console.log(Datas);
-                vm.Datas(Datas);
-                
-                var QuestionItem=Datas[Number(oItemIndex)];
-                console.log(QuestionItem);
-                //ajax请求
-//              Save(QuestionItem);		//QuestionItem:添加选项的题目对象
             })
 
             $("body").on("input", ".question-text", function () {
                 var oText = $(this).text();
-                var oIndex = $(this).attr("index");
-                var oItemIndex = $(this).parent(".question-choice-option").parent(".question-options").attr("index");
-                Datas[Number(oItemIndex)].QuestionOptions[Number(oIndex)].OptionContent = oText;
+                var oIndex = Number($(this).attr("index"));
+                var oItemIndex = Number($(this).parent(".question-choice-option").parent(".question-options").attr("index"));
+                Datas[oItemIndex].QuestionOptions[oIndex].OptionContent = oText;
             })
 
-            function getData() {
-                var question = {};
-                question["QuestionId"] = questionId;     //题目Id
-                question["TypeId"] = currentTypeId;     //题目类型Id
-                question["QuestionnaireId"] = questionnaireId;// -------问卷Id
-                question["MustFill"] = isMustFillQ;   // ---------------是否必填
-                question["QuestionName"] = contentQ;	//  --------题目名称
-                question["DisplayOrder"] = displayOrderQ;  //// ----------题目循序(排序)
-                question["MinOption"] = Number(heightQ);//--------- 题目的最小选项
-                question["MaxOption"] = Number(heightQ);    //--------- 题目的最大选项
-                question["Score"] = Number(scoreQ);        // --------- 题目分值
-                question["DisplayMode"] = Number(DisplayMode);   //---- 题目显示方式(横向或者纵向)
-
-                var options = [];
-                option["OptionId"]// ====选项Id,即选项的循序
-                option["OptionContent"]//==== 选项的名称
-                option["AllowWrite"]// ====== 是否有填写的文本框
-                option["OptionScore"]// ===== 分值
-                option["DisplayOrder"]// ==== 显示的循序
-                options.push(option)
-            }
         })
     </script>
 </body>

@@ -1,31 +1,31 @@
 (function($,owner){
-	owner.get=function(options,successFun,errorFun){
+	owner.get=function(params,successFun,errorFun){
 		if(!options){
 			return;
 		}
-		options.type="GET";
-		setoptions(options);
-		communication(options,successFun,errorFun);
+		params.type="GET";
+		setparams(params);
+		communication(params,successFun,errorFun);
 	};
-	owner.post=function(options,successFun,errorFun){
-		if(!options){
+	owner.post=function(params,successFun,errorFun){
+		if(!params){
 			return;
 		}
-		options.type="POST";
-		setoptions(options);
+		params.type="POST";
+		setparams(params);
 		
-		communication(options,successFun,errorFun);
+		communication(params,successFun,errorFun);
 	};
-	function setoptions(options){
-		options.data=options.data||{};
-		options.dataType=options.dataType||'json';
+	function setparams(params){
+		params.data=params.data||{};
+		params.dataType=params.dataType||'json';
 	}
-	function communication(options,successFun,errorFun){
+	function communication(params,successFun,errorFun){
 		$.ajax({
-			url:options.controller,
-			type:options.type,
-			dataType:options.dataType,
-			data:options.data,
+			url:params.controller,
+			type:params.type,
+			dataType:params.dataType,
+			data:params.data,
 			success:function(result){
 				successFun&&successFun(result);
 			},
