@@ -10,7 +10,7 @@ html,body{
 	position:relative;
 	font-size:14px;
 }
-.clearfix{
+.clearfixdiv{
 	visibility:hidden;
 	display:block;
 	font-size:0;
@@ -55,6 +55,12 @@ input{
 }
 .red{
 	color: red;
+}
+p{
+	margin:0;
+}
+.h1, .h2, .h3, h1, h2, h3 {
+ 	margin:0;
 }
 /***************************弹窗******************************/
 .g_alert{
@@ -547,16 +553,11 @@ input[type=checkbox]:checked:before {
 .content-box .content-right .question-box .question-item .dec-input-box .dec-input{
     width: 668px;
     font-size:14px;
-    line-height:30px;
+    padding:5px 0;
     border:1px solid #fff;
     text-align:left;
     outline:none;
     resize:none;
-    user-modify: read-only;
-	user-modify: read-write;
-	user-modify: write-only;
-	user-modify: read-write-plaintext-only;
-	-webkit-user-modify: read-write-plaintext-only;
 }
 .content-box .content-right .question-box .question-item .dec-input-box .dec-input:focus{
 	border:1px solid #333;
@@ -788,4 +789,21 @@ input[type=checkbox]:checked:before {
 }
 
 
-
+/********************************富文本编辑******************************/
+.dialog .editor-box{
+	width:598px;
+	margin-left:-299px;
+	background:#fff;
+}
+.dialog .editor-box .tip-top{
+	width:598px;
+}
+.dialog .editor-box .tip-bottom{
+	width:598px;
+}
+.dialog .tip-box .tip-bottom .confirm-editor-btn{
+    left:200px;
+}
+.dialog .tip-box .tip-bottom .cancel-editor-btn{
+    right:200px;
+}

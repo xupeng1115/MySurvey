@@ -10,12 +10,14 @@
 
     <link href="css/bootstrap.min.css" rel="stylesheet" />
     <link href="css/font-awesome.min.css" rel="stylesheet" />
-    <link href="css/EditQuestions2.css?v=20171103" rel="stylesheet" />
+    <link href="css/wangEditor.css" rel="stylesheet" type="text/css">
+    <link href="css/EditQuestions2.css?v=20171106" rel="stylesheet" />
 
     <script src="js/jquery-1.11.3.min.js"></script>
     <script src="js/jquery-ui.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/knockout.min.js"></script>
+    <script src="js/wangEditor.min.js"></script>
     <script src="js/communication.js"></script>
 
 </head>
@@ -58,7 +60,7 @@
                             <!-- /ko -->
                             <!-- ko if:(TypeId===5) -->
                             <div class="dec-input-box">
-                                <div contenteditable="true" class="dec-input question-title-text input-hf" data-bind="text:QuestionName,attr:{type:TypeId,index:$index()}"><!--描述说明--></div>
+                                <div contenteditable="true" class="dec-input question-title-text input-hf" data-bind="html:QuestionName,attr:{type:TypeId,index:$index()},click:$parent.RichEditor.bind($data,event,$index())"><!--描述说明--></div>
                             </div>
                             <!-- /ko -->
                             <!-- ko if:(TypeId===3) -->
@@ -201,29 +203,42 @@
                     <div class="cancel-btn tip-btn" data-bind="click:DeleteCancel">取消</div>
                 </div>
             </div>
+            <div class="editor-box tip-box" data-bind="visible:RichEditorShow" style="display:none;">
+            	<div class="tip-top">
+                    <span class="tip-title">富文本编辑</span>
+                    <div class="close-btn" data-bind="click:DeleteClose"><i class="fa fa-times" aria-hidden="true"></i></div>
+                </div>
+            	<div id="wangEditorDiv">
+				    <p>请输入内容...</p>
+				</div>
+				<div class="tip-bottom">
+                    <div class="confirm-btn confirm-editor-btn tip-btn" data-bind="click:EditorConfirm">确定</div>
+                    <div class="cancel-btn cancel-editor-btn tip-btn" data-bind="click:DeleteCancel">取消</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         var Lists=[
 			{
-				"TypeId":0,
+				"TypeId":1,
 				"TypeName":"单选题"
 			},
 			{
-				"TypeId":1,
+				"TypeId":2,
 				"TypeName":"多选题"
 			},
 			{
-				"TypeId":2,
+				"TypeId":3,
 				"TypeName":"单行问答题"
 			},
 			{
-				"TypeId":3,
+				"TypeId":4,
 				"TypeName":"多行问答题"
 			},
 			{
-				"TypeId":4,
+				"TypeId":5,
 				"TypeName":"描述说明"
 			}
 		]
@@ -284,7 +299,7 @@
                 "QuestionId": 343,
                 "TypeId": 5,
                 "QuestionnaireId": 100,
-                "QuestionName": "描述说明",
+                "QuestionName": "<p style='color:#ff6060;'>描述说明</p>",
                 "DisplayOrder": 5,
                 "MinOption": 0,
                 "MaxOption": 0,
@@ -592,13 +607,16 @@
             BatchType:ko.observable(),
             Lists: ko.observableArray(Lists),
             Datas: ko.observableArray(Datas),
+            
+            RichEditorShow:ko.observable(false),
+            CurrentDecHtml:ko.observable(''),
+            CurrentEditorHtml:ko.observable(''),
             AddItem: function (event, type, data) {
                 if (vm.ContinueAdd()) {
                     vm.ContinueAdd(false);
                     //深拷贝
                     var TemplateDatas2 = $.extend(true, [], TemplateDatas);
                     var oTemplate = TemplateDatas2[type];
-
                     oTemplate.DisplayOrder = Datas.length + 1;
 						
 					var Datas2 = $.extend(true, [], Datas);
@@ -643,6 +661,7 @@
                 vm.HideDialog();
             },
             DeleteClose: function () {
+            	$(".question-item").eq(vm.CurrentItem()).find(".dec-input-box").find(".dec-input").blur();
                 vm.HideDialog();
             },
             DeleteQuestionConfirm: function () {
@@ -856,6 +875,24 @@
                 Datas = Datas2;
 				vm.Datas(Datas);
             },
+            RichEditor:function(event, index, data){
+            	vm.CurrentItem(index);
+                vm.DialogShow(true);
+                vm.RichEditorShow(true);
+                vm.CurrentDecHtml(Datas[index].QuestionName);
+               	vm.CurrentEditorHtml(Datas[index].QuestionName);
+               	editor.$txt.html(Datas[index].QuestionName+'<p><br></p>');
+            },
+            EditorConfirm:function(){
+            	if(vm.CurrentDecHtml()!==vm.CurrentEditorHtml()){
+            		 var Datas2 = $.extend(true, [], Datas);
+                    Datas2[vm.CurrentItem()].QuestionName = vm.CurrentEditorHtml();
+                    Datas = Datas2;
+	            	vm.Datas(Datas);
+            	}
+            	vm.DialogShow(false);
+	            vm.RichEditorShow(false);
+            },
             Num: function (index) {
                 var num = 0;
                 for (var i = 0; i < vm.Datas().length; i++) {
@@ -880,6 +917,7 @@
                 vm.QuestionSetShow(false);
                 vm.OptionSetShow(false);
                 vm.BatchAddOptionShow(false);
+                vm.RichEditorShow(false);
 
                 vm.DialogShow(false);
             },
@@ -930,12 +968,52 @@
 
         ko.applyBindings(vm);
         
+        //生成配置富文本编辑器
+		var editor = new wangEditor('wangEditorDiv');
+		editor.config.menus = [
+	        'source',
+	        '|',
+	        'fontfamily',
+	        'fontsize',
+	        'head',
+	        'bold',
+	        'underline',
+	        'italic',
+	        'strikethrough',
+	        'forecolor',
+	        'bgcolor',
+	        '|',
+	        'undo',
+	        'redo',
+	        'eraser',
+    	];
+		// 配置 onchange 事件
+	    editor.onchange = function () {
+	        // 编辑区域内容变化时，实时打印出当前内容
+	        var STR='';
+	        var Str=this.$txt.html();
+	        var oLen=this.$txt.html().length;
+	        var oStr=Str.slice(oLen-11);
+	       	if(oStr==='<p><br></p>'){
+	       		STR=Str.slice(0,oLen-11);
+	       		if(STR.indexOf("<p>请输入内容...</p>")>=0){
+	       			STR=vm.CurrentDecHtml();
+	       		}
+	       	}else{
+	       		STR=Str;
+	       	}
+	        vm.CurrentEditorHtml(STR);
+	    };
+		editor.create();
+        
         $(document).ready(function () {
             //页面加载完首先执行
             Ready();
 
             function Ready() {
-                //Init();
+            	
+                //Init();加载数据列表
+
                 //拖拽排序
                 $(function () {
                     var sort = $("#sortable").sortable({
@@ -1015,8 +1093,8 @@
                         }
                         break;
                     case '5':
-                        if ($(this).text() === "描述说明") {
-                            $(this).text("");
+                        if ($(this).html() === "描述说明") {
+                            $(this).html("");
                         }
                         break;
                 }
@@ -1046,8 +1124,8 @@
                         }
                         break;
                     case '5':
-                        if ($(this).text() === "") {
-                            $(this).text("描述说明");
+                        if ($(this).html() === "") {
+                            $(this).html("描述说明");
                         }
                         break;
                 }
@@ -1110,17 +1188,20 @@
             });
             //题目标题
 			$("body").on("blur", ".question-title-text", function () {
-                var oQuestionTitle= $(this).text();
-                var oIndex = Number($(this).attr("index"));
-
-                if (oQuestionTitle !== Datas[oIndex].QuestionName) {
-
-                    var Datas2 = $.extend(true, [], Datas);
-                    Datas2[oIndex].QuestionName = oQuestionTitle;
-
-                    Datas = Datas2;
-                    vm.Datas(Datas);
-                }
+				var oDec=$(this).hasClass("dec-input");
+				if(!oDec){
+					var oQuestionTitle= $(this).text();
+	                var oIndex = Number($(this).attr("index"));
+	
+	                if (oQuestionTitle !== Datas[oIndex].QuestionName) {
+	
+	                    var Datas2 = $.extend(true, [], Datas);
+	                    Datas2[oIndex].QuestionName = oQuestionTitle;
+	
+	                    Datas = Datas2;
+	                    vm.Datas(Datas);
+	                }
+				} 
             })
 
             $("body").on("input", ".question-text", function () {

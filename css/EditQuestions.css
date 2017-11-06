@@ -708,3 +708,18 @@ input[type=checkbox]:checked:before {
 	color:#333;
 	margin-left:10px;
 }
+
+
+/********************************富文本编辑******************************/
+.dialog .editor-box{
+	width:788px;
+	margin-left:-394px;
+	
+}
+.dialog .editor-box .tip-top{
+	width:788px;
+}
+.dialog .editor-box .tip-bottom{
+	width:788px;
+}
+
