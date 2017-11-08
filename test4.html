@@ -88,7 +88,7 @@
                                             <i class="fa fa-square-o" data-bind="visible:AllowWrite===0,click:$root.CheckboxShow.bind($data,event,$index())" aria-hidden="true" style="display:none;"></i>
                                             <i class="fa fa-check-square" data-bind="visible:AllowWrite===1,click:$root.CheckboxShow.bind($data,event,$index())" aria-hidden="true" style="display:none;"></i>
                                         </li>
-                                        <li class="option-select-item option-type-scroe" title="选项设置" data-bind="attr:{index:$index()},click:$root.OptionSet.bind($data,event,$index())"></li>
+                                        <li class="option-select-item option-type-scroe" title="选项设置" data-bind="attr:{index:$index()},click:$root.OptionSet.bind($data,event,$index(),$element,$context,$parent,$parentContext)"></li>
                                         <li class="option-select-item option-type-delete" title="删除" data-bind="attr:{index:$index()},click:$root.DeleteOption.bind($data,event,$index())"></li>
                                         <li class="option-select-item option-type-up" title="上移" data-bind="attr:{index:$index(),type:'up'},click:$root.Move.bind($data,event,$index())"></li>
                                         <li class="option-select-item option-type-down" title="下移" data-bind="attr:{index:$index(),type:'down'},click:$root.Move.bind($data,event,$index())"></li>
@@ -101,7 +101,7 @@
                             <!-- /ko -->
                             <!-- ko if:(TypeId===1||TypeId===2) -->
                             <div class="add-area">
-                                <div class="add-choice" title="增加" data-bind="attr:{index:$index(),type:TypeId},click:$parent.AddOption.bind($data,event,$index())"></div>
+                                <div class="add-choice" title="增加" data-bind="attr:{index:$index(),type:TypeId,context:$parentContext,parent:$parent},click:$parent.AddOption.bind($data,event,$index(),$parent,$parentContext)"></div>
                                 <div class="batch-add-choice" title="批量增加" data-bind="attr:{index:$index(),type:TypeId},click:$parent.BatchAddOption.bind($data,event,$index())"></div>
                             </div>
                             <!-- /ko -->
@@ -745,7 +745,16 @@
     	        vm.DialogShow(false);
     	        vm.QuestionSetShow(false);
             },
-            OptionSet: function (event, index, data) {
+            OptionSet: function (event,index,element,context,parent,parentcontext,data) {
+            	console.log(event);
+            	console.log(index);
+            	console.log(element);
+            	console.log(context);
+            	console.log(parent);
+            	console.log(parentcontext);
+            	console.log(data);
+            	console.log(parentcontext.$index());
+
                 var oItemIndex = $(event.target).parent(".option-select").parent(".question-choice-option").parent(".question-options").attr("index");
                 vm.CurrentItem(Number(oItemIndex));
                 vm.CurrentOption(index);
@@ -764,7 +773,12 @@
                 vm.DialogShow(false);
                 vm.OptionSetShow(false);
             },
-            AddOption:function(event,index,data){
+            AddOption:function(event,index,parent,context,data){
+            	console.log(event);
+            	console.log(index);
+            	console.log(parent);
+            	console.log(context);
+            	console.log(data);
                 var oItemIndex = index;
                 var oLen = Datas[oItemIndex].QuestionOptions.length;
                 var oType = $(event.target).attr("type");
