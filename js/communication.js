@@ -1,6 +1,6 @@
 (function($,owner){
 	owner.get=function(params,successFun,errorFun){
-		if(!options){
+		if(!params){
 			return;
 		}
 		params.type="GET";
